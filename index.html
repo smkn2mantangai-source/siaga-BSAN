@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIAGA BSAN - Sekolah Aman, Nyaman & Menyenangkan</title>
+  <title>SIAGA BSAN - SMKN 2 Mantangai</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -19,640 +17,483 @@
     .custom-shadow {
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     }
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .hide-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    /* Loading overlay */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     #loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.7);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(2px);
+      display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.75);
+      z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(2px);
     }
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
   <!-- TOP HEADER / NAVBAR -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('beranda')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white text-lg shadow-sm transform hover:scale-105 transition-transform">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="goToView('beranda')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white text-lg shadow-sm">
           <i class="fa-solid fa-shield-cat"></i>
         </div>
         <div>
-          <h1 class="font-bold text-slate-800 text-base leading-tight">SIAGA BSAN</h1>
-          <p class="text-xs text-slate-500 font-medium hidden sm:block">Aman, Nyaman & Menyenangkan</p>
+          <h1 class="font-bold text-slate-800 text-sm sm:text-base leading-tight">SIAGA BSAN</h1>
+          <p class="text-[10px] sm:text-xs text-slate-500 font-medium">SMKN 2 Mantangai</p>
         </div>
       </div>
 
+      <nav class="hidden md:flex items-center space-x-1">
+        <button onclick="goToView('beranda')" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition">Beranda</button>
+        <button onclick="goToView('lacak')" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition">Cek Status Laporan</button>
+      </nav>
+
       <div class="flex items-center space-x-2">
-        <button onclick="openAdminModal()" id="btn-login-modal" class="px-3.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center gap-1.5">
+        <button onclick="openAdminModal()" id="btn-login-modal" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center gap-1.5">
           <i class="fa-solid fa-user-shield text-slate-500"></i>
-          <span>Petugas</span>
+          <span class="hidden sm:inline">Portal Petugas & Tim</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 mb-10">
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 px-3 py-2 flex justify-around shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <button onclick="goToView('beranda')" class="flex flex-col items-center text-[10px] font-medium text-slate-600 hover:text-indigo-600 py-1">
+      <i class="fa-solid fa-house text-lg mb-1"></i> Beranda
+    </button>
+    <button onclick="goToView('lacak')" class="flex flex-col items-center text-[10px] font-medium text-slate-600 hover:text-indigo-600 py-1">
+      <i class="fa-solid fa-magnifying-glass text-lg mb-1"></i> Lacak
+    </button>
+  </div>
 
-    <!-- ================= TAB 1: BERANDA ================= -->
-    <section id="tab-beranda" class="space-y-6 block">
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 mb-20 md:mb-6 relative">
+
+    <!-- ================= VIEW: BERANDA (HUB) ================= -->
+    <section id="view-beranda" class="space-y-6 block">
+      
       <!-- Hero Banner -->
       <div class="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-8 relative overflow-hidden custom-shadow">
         <div class="absolute right-0 top-0 opacity-10 pointer-events-none translate-x-1/4 -translate-y-1/4">
            <i class="fa-solid fa-shield-cat text-[200px]"></i>
         </div>
         <div class="relative z-10 max-w-2xl">
-          <span class="inline-block px-3 py-1 bg-indigo-500/30 text-indigo-200 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-3 border border-indigo-500/50">Portal Siaga BSAN</span>
-          <h2 class="text-2xl sm:text-3xl font-bold mb-2">Sekolah Ramah, Ruang Aman untuk Berkembang</h2>
-          <p class="text-slate-300 text-sm leading-relaxed mb-6">Pilih layanan di bawah ini untuk melaporkan masalah, berbagi apresiasi, atau meminta bantuan dengan aman dan nyaman.</p>
+          <span class="inline-block px-3 py-1 bg-indigo-500/30 text-indigo-200 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-3 border border-indigo-500/50">SMKN 2 Mantangai Ramah Anak</span>
+          <h2 class="text-2xl sm:text-3xl font-bold mb-2">Budaya Sekolah Aman, Nyaman & Menyenangkan</h2>
+          <p class="text-slate-300 text-sm leading-relaxed mb-6">Ruang kolaborasi digital siswa, guru, dan Tim BSAN untuk mewujudkan ekosistem belajar yang positif dan inklusif.</p>
         </div>
       </div>
 
-      <!-- GRID MENU SHORTCUT -->
+      <!-- Menu Layanan Cepat (Shortcut Grid) -->
       <div>
-        <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-border-all text-indigo-500"></i> Layanan Cepat
-        </h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
-          <button onclick="switchTab('form-aduan')" class="bg-white p-4 rounded-2xl border border-rose-100 hover:border-rose-300 hover:shadow-lg transition-all group flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-bullhorn"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Lapor Aduan</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Perundungan/Masalah</p>
-          </button>
+        <h3 class="font-bold text-slate-800 text-base mb-3 px-1">Layanan Utama</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          
+          <div onclick="goToView('aduan')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-rose-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-bullhorn"></i></div>
+            <h4 class="font-bold text-slate-700 text-xs">Lapor Aduan</h4>
+            <p class="text-[9px] text-slate-400 mt-1">Bullying/Masalah</p>
+          </div>
 
-          <button onclick="switchTab('form-bk')" class="bg-white p-4 rounded-2xl border border-indigo-100 hover:border-indigo-300 hover:shadow-lg transition-all group flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-comments"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Janji BK</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Konseling Siswa</p>
-          </button>
+          <div onclick="goToView('bk')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-indigo-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-user-nurse"></i></div>
+            <h4 class="font-bold text-slate-700 text-xs">Antre BK</h4>
+            <p class="text-[9px] text-slate-400 mt-1">Janji Konseling</p>
+          </div>
 
-          <button onclick="switchTab('form-refleksi')" class="bg-white p-4 rounded-2xl border border-emerald-100 hover:border-emerald-300 hover:shadow-lg transition-all group flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-clipboard-check"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Refleksi</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Check-out Harian</p>
-          </button>
+          <div onclick="goToView('refleksi')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-clipboard-check"></i></div>
+            <h4 class="font-bold text-slate-700 text-xs">Refleksi</h4>
+            <p class="text-[9px] text-slate-400 mt-1">Jurnal Harian</p>
+          </div>
 
-          <button onclick="switchTab('form-sarpras')" class="bg-white p-4 rounded-2xl border border-sky-100 hover:border-sky-300 hover:shadow-lg transition-all group flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-wrench"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Lapor Sarpras</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Kerusakan Fasilitas</p>
-          </button>
+          <div onclick="goToView('sarpras')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-sky-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-wrench"></i></div>
+            <h4 class="font-bold text-slate-700 text-xs">Sarpras</h4>
+            <p class="text-[9px] text-slate-400 mt-1">Lapor Kerusakan</p>
+          </div>
 
-          <button onclick="switchTab('form-kudos')" class="bg-white p-4 rounded-2xl border border-amber-100 hover:border-amber-300 hover:shadow-lg transition-all group flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-gift"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Kudos Wall</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Kirim Apresiasi</p>
-          </button>
+          <div onclick="goToView('kudos')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-gift"></i></div>
+            <h4 class="font-bold text-slate-700 text-xs">Kudos Wall</h4>
+            <p class="text-[9px] text-slate-400 mt-1">Kirim Apresiasi</p>
+          </div>
 
-          <button onclick="switchTab('form-misi')" class="bg-white p-4 rounded-2xl border border-purple-100 hover:border-purple-300 hover:shadow-lg transition-all group flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-trophy"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Misi Habit</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Klaim Poin Baik</p>
-          </button>
+          <div onclick="goToView('misi')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-purple-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-trophy"></i></div>
+            <h4 class="font-bold text-slate-700 text-xs">Misi Habit</h4>
+            <p class="text-[9px] text-slate-400 mt-1">Klaim Poin</p>
+          </div>
 
-          <!-- Tracking Shortcut -->
-          <button onclick="switchTab('cek-status')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-slate-400 hover:shadow-lg transition-all group flex flex-col items-center text-center bg-slate-50">
-            <div class="w-12 h-12 rounded-full bg-white text-slate-600 flex items-center justify-center text-xl mb-3 shadow-sm group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Cek Status</h4>
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">Lacak Laporanmu</p>
-          </button>
         </div>
       </div>
 
       <!-- Feed & Status Publik -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <!-- Kudos Feed -->
-        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 custom-shadow">
-          <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+        <div class="lg:col-span-2 bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 custom-shadow">
+          <div class="flex justify-between items-center mb-4">
             <div>
-              <h3 class="font-bold text-slate-800 text-base">💌 Dinding Apresiasi Terkini</h3>
-              <p class="text-[11px] text-slate-500">Pesan kebaikan antar warga sekolah</p>
+              <h3 class="font-bold text-slate-800 text-base">💌 Kudos Wall (Apresiasi Terbaru)</h3>
+              <p class="text-[10px] text-slate-500">Semangat positif antar warga sekolah</p>
             </div>
+            <button onclick="goToView('kudos')" class="text-xs font-semibold text-indigo-600 hover:underline">Tulis Pesan</button>
           </div>
           <div id="kudos-stream" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">
             <div class="text-center py-8 text-slate-400 text-xs col-span-2">Memuat pesan apresiasi...</div>
           </div>
         </div>
 
-        <!-- Pantauan Sarpras Singkat -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex flex-col justify-between custom-shadow">
-          <div>
-            <h3 class="font-bold text-slate-800 text-base mb-1">🔧 Status Perbaikan</h3>
-            <p class="text-[11px] text-slate-500 mb-4 border-b border-slate-100 pb-2">Pantauan laporan fasilitas</p>
-            <div id="sarpras-quick-list" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-              <div class="text-center py-6 text-slate-400 text-xs">Memuat data sarpras...</div>
-            </div>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 custom-shadow flex flex-col">
+          <h3 class="font-bold text-slate-800 text-base mb-1">🔧 Pantauan Sarpras</h3>
+          <p class="text-[10px] text-slate-500 mb-4">Status perbaikan fasilitas</p>
+          <div id="sarpras-quick-list" class="space-y-2.5 flex-grow overflow-y-auto max-h-60 pr-1">
+            <div class="text-center py-6 text-slate-400 text-xs">Memuat data sarpras...</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= HALAMAN KHUSUS: FORM ADUAN ================= -->
-    <section id="tab-form-aduan" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
-      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-rose-100 custom-shadow">
-        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-bullhorn"></i>
-          </div>
+    <!-- ================= VIEW: FORM ADUAN ================= -->
+    <section id="view-aduan" class="hidden max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <button onclick="goToView('beranda')" class="mb-4 text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda</button>
+      
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-bullhorn"></i></div>
           <div>
-            <h2 class="font-bold text-slate-800 text-lg">Lapor Pengaduan</h2>
-            <p class="text-xs text-slate-500">Privasi Anda terjamin. Jangan ragu mencari bantuan.</p>
+            <h2 class="text-xl font-bold text-slate-800">Formulir Pengaduan</h2>
+            <p class="text-xs text-slate-500">Privasi Anda terjamin. Laporkan perundungan atau masalah dengan aman.</p>
           </div>
         </div>
 
         <form id="form-aduan" onsubmit="handleFormAduan(event)" class="space-y-5">
-          <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-start gap-3">
-            <input type="checkbox" id="aduan-anonim" onchange="toggleAnonim(this)" class="mt-1 rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer">
-            <label for="aduan-anonim" class="text-xs sm:text-sm text-rose-800 cursor-pointer">
-              <span class="font-bold block mb-0.5">Kirim Sebagai Anonim (Rahasia)</span>
-              Identitas Anda tidak akan dicatat pada sistem sama sekali.
+          <div class="bg-rose-50/50 border border-rose-100 p-3 rounded-xl flex items-start gap-2.5">
+            <input type="checkbox" id="aduan-anonim" onchange="toggleAnonim(this, 'identitas-aduan', ['aduan-nisn', 'aduan-nama', 'aduan-kelas'])" class="mt-1 rounded text-rose-600 w-4 h-4">
+            <label for="aduan-anonim" class="text-xs text-rose-800 cursor-pointer">
+              <span class="font-bold block">Kirim Sebagai Anonim (Rahasia)</span>
+              Identitas Anda tidak akan dicatat di database sistem.
             </label>
           </div>
 
           <div id="identitas-aduan" class="grid grid-cols-1 sm:grid-cols-2 gap-4 transition-opacity">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Lengkap</label>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
               <input type="text" id="aduan-nama" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Nama Anda">
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1.5">NISN / ID</label>
-                <input type="text" id="aduan-nisn" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="123456">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Kelas</label>
+                <input type="text" id="aduan-kelas" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="X TKJ">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kelas</label>
-                <input type="text" id="aduan-kelas" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="X RPL 1">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">NISN / ID</label>
+                <input type="text" id="aduan-nisn" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="12345">
               </div>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kategori Permasalahan *</label>
-            <select id="aduan-kategori" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-white">
-              <option value="" disabled selected>-- Pilih Kategori --</option>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori Masalah *</label>
+            <select id="aduan-kategori" required class="w-full text-sm p-3 border rounded-xl bg-white focus:ring-2 focus:ring-rose-500 outline-none">
+              <option value="" disabled selected>Pilih Kategori...</option>
               <option value="Perundungan Fisik / Verbal">Perundungan Fisik / Verbal</option>
-              <option value="Cyberbullying (Media Sosial)">Cyberbullying (Media Sosial / Chat)</option>
+              <option value="Cyberbullying (Media Sosial)">Cyberbullying (Media Sosial / Pesan)</option>
               <option value="Pengucilan / Diskriminasi">Pengucilan / Diskriminasi</option>
-              <option value="Kekerasan Seksual / Pelecehan">Pelecehan / Kekerasan Seksual</option>
+              <option value="Pelecehan / Kekerasan">Pelecehan / Kekerasan</option>
               <option value="Lainnya">Lainnya</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kronologi Kejadian *</label>
-            <textarea id="aduan-kronologi" required rows="5" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Tuliskan tempat kejadian, perkiraan waktu, siapa yang terlibat, dan bagaimana kejadiannya secara rinci..."></textarea>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Kronologi Kejadian *</label>
+            <textarea id="aduan-kronologi" required rows="4" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Ceritakan detail kejadiannya (waktu, tempat, pihak yang terlibat)..."></textarea>
           </div>
 
+          <!-- Opsi File Bukti -->
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-2">Bukti / Tangkapan Layar (Opsional)</label>
-            <div class="flex gap-2 mb-3">
-              <button type="button" onclick="toggleBukti('aduan', 'link')" id="btn-aduan-link" class="flex-1 py-2 text-xs font-bold bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition-colors">🔗 Pakai Tautan</button>
-              <button type="button" onclick="toggleBukti('aduan', 'file')" id="btn-aduan-file" class="flex-1 py-2 text-xs font-bold bg-slate-50 text-slate-500 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">📁 Unggah File</button>
+            <label class="block text-xs font-semibold text-slate-600 mb-2">Lampiran Bukti (Opsional)</label>
+            <div class="flex gap-2 mb-3 bg-slate-100 p-1 rounded-lg w-max">
+              <button type="button" id="tab-url-aduan" onclick="switchBuktiType('aduan', 'url')" class="px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition">Pakai Tautan</button>
+              <button type="button" id="tab-file-aduan" onclick="switchBuktiType('aduan', 'file')" class="px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition">Unggah File</button>
             </div>
             
-            <div id="aduan-bukti-link-container">
-              <input type="url" id="aduan-bukti-link" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="https://drive.google.com/...">
-              <p class="text-[10px] text-slate-500 mt-1">Unggah ke G-Drive, pastikan akses publik, dan tempel link di sini.</p>
+            <div id="input-url-aduan">
+              <input type="url" id="aduan-bukti-url" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="https://drive.google.com/...">
             </div>
             
-            <div id="aduan-bukti-file-container" class="hidden">
-              <input type="file" id="aduan-bukti-file" accept="image/*,.pdf" class="w-full text-sm p-2 border rounded-xl border-dashed border-2 border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200 transition-all cursor-pointer">
-              <p class="text-[10px] text-slate-500 mt-1">Maks 2MB (Gambar/PDF). File akan terunggah otomatis.</p>
+            <div id="input-file-aduan" class="hidden">
+              <input type="file" id="aduan-bukti-file" accept="image/*,.pdf" class="w-full text-sm p-2 border rounded-xl bg-slate-50 text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200 transition">
+              <p class="text-[10px] text-slate-400 mt-1">Maks. 2MB (Gambar / PDF).</p>
             </div>
-            <input type="hidden" id="aduan-bukti-type" value="link">
           </div>
 
-          <button type="submit" class="w-full py-3.5 mt-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-            Kirim Laporan
-          </button>
+          <button type="submit" class="w-full py-3.5 mt-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-lg transition">Kirim Laporan Rahasia</button>
         </form>
       </div>
     </section>
 
-    <!-- ================= HALAMAN KHUSUS: FORM JANJI BK ================= -->
-    <section id="tab-form-bk" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
-      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-indigo-100 custom-shadow">
-        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-comments"></i>
-          </div>
+    <!-- ================= VIEW: FORM BK ================= -->
+    <section id="view-bk" class="hidden max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <button onclick="goToView('beranda')" class="mb-4 text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda</button>
+      
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg"><i class="fa-solid fa-user-nurse"></i></div>
           <div>
-            <h2 class="font-bold text-slate-800 text-lg">Pendaftaran Konseling BK</h2>
-            <p class="text-xs text-slate-500">Pesan sesi konseling tatap muka tanpa antre di sekolah.</p>
+            <h2 class="text-xl font-bold text-slate-800">Antre Konseling BK</h2>
+            <p class="text-xs text-slate-500">Pesan jadwal temu tanpa harus canggung mengantre di ruang BK.</p>
           </div>
         </div>
 
-        <form id="form-bk" onsubmit="handleFormBK(event)" class="space-y-5">
+        <form id="form-bk" onsubmit="handleFormBK(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Lengkap *</label>
-            <input type="text" id="bk-nama" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ketik nama Anda">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap *</label>
+            <input type="text" id="bk-nama" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
-          
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">NISN (Opsional)</label>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Kelas *</label>
+              <input type="text" id="bk-kelas" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">NISN</label>
               <input type="text" id="bk-nisn" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kelas *</label>
-              <input type="text" id="bk-kelas" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: XII IPA 1">
-            </div>
           </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Tanggal Diharapkan *</label>
-              <input type="date" id="bk-tanggal" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Diharapkan *</label>
+              <input type="date" id="bk-tanggal" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Sesi Waktu *</label>
-              <select id="bk-sesi" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-slate-700">
-                <option value="" disabled selected>-- Pilih Waktu --</option>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Sesi *</label>
+              <select id="bk-sesi" required class="w-full text-sm p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="" disabled selected>Pilih Sesi...</option>
                 <option value="Istirahat 1">Istirahat 1</option>
                 <option value="Istirahat 2">Istirahat 2</option>
-                <option value="Pulang Sekolah">Setelah Pulang Sekolah</option>
+                <option value="Pulang Sekolah">Pulang Sekolah</option>
               </select>
             </div>
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Topik Pembicaraan *</label>
-            <input type="text" id="bk-topik" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Misal: Pilihan Karir, Masalah Pribadi, Kendala Belajar">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Topik Pembicaraan *</label>
+            <input type="text" id="bk-topik" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Misal: Karir, Masalah Belajar, Pribadi...">
           </div>
-
-          <button type="submit" class="w-full py-3.5 mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-            Kirim Permintaan Konseling
-          </button>
+          <button type="submit" class="w-full py-3.5 mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg transition">Kirim Permintaan Jadwal</button>
         </form>
       </div>
     </section>
 
-    <!-- ================= HALAMAN KHUSUS: FORM REFLEKSI ================= -->
-    <section id="tab-form-refleksi" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
-      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-emerald-100 custom-shadow">
-        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-clipboard-check"></i>
-          </div>
+    <!-- ================= VIEW: FORM SARPRAS ================= -->
+    <section id="view-sarpras" class="hidden max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <button onclick="goToView('beranda')" class="mb-4 text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda</button>
+      
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-lg"><i class="fa-solid fa-wrench"></i></div>
           <div>
-            <h2 class="font-bold text-slate-800 text-lg">Check-Out / Refleksi Harian</h2>
-            <p class="text-xs text-slate-500">Bantu kami memahami perasaan belajar Anda hari ini.</p>
+            <h2 class="text-xl font-bold text-slate-800">Lapor Kerusakan Sarpras</h2>
+            <p class="text-xs text-slate-500">Bantu sekolah segera memperbaiki fasilitas fisik yang rusak.</p>
           </div>
         </div>
 
-        <form id="form-refleksi" onsubmit="handleFormRefleksi(event)" class="space-y-5">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Siswa *</label>
-              <input type="text" id="ref-nama" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kelas *</label>
-              <input type="text" id="ref-kelas" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: XI TKJ 2">
-            </div>
-          </div>
-
+        <form id="form-sarpras" onsubmit="handleFormSarpras(event)" class="space-y-4">
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-3">Bagaimana emosi Anda seharian ini? *</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <label class="cursor-pointer border-2 border-transparent bg-slate-50 p-4 rounded-xl text-center hover:bg-slate-100 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md relative">
-                <input type="radio" name="ref-emosi" value="Sangat Bahagia / Semangat" class="sr-only" checked>
-                <span class="text-3xl block mb-2">😄</span>
-                <span class="text-xs font-bold text-slate-700">Semangat</span>
-              </label>
-              <label class="cursor-pointer border-2 border-transparent bg-slate-50 p-4 rounded-xl text-center hover:bg-slate-100 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md relative">
-                <input type="radio" name="ref-emosi" value="Biasa Saja / Tenang" class="sr-only">
-                <span class="text-3xl block mb-2">🙂</span>
-                <span class="text-xs font-bold text-slate-700">Biasa Saja</span>
-              </label>
-              <label class="cursor-pointer border-2 border-transparent bg-slate-50 p-4 rounded-xl text-center hover:bg-slate-100 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md relative">
-                <input type="radio" name="ref-emosi" value="Lelah / Capek" class="sr-only">
-                <span class="text-3xl block mb-2">🥱</span>
-                <span class="text-xs font-bold text-slate-700">Lelah</span>
-              </label>
-              <label class="cursor-pointer border-2 border-transparent bg-slate-50 p-4 rounded-xl text-center hover:bg-slate-100 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md relative">
-                <input type="radio" name="ref-emosi" value="Cemas / Sedih" class="sr-only">
-                <span class="text-3xl block mb-2">😔</span>
-                <span class="text-xs font-bold text-slate-700">Sedih/Cemas</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Apa yang paling Anda sukai / pelajari hari ini? *</label>
-            <textarea id="ref-catatan" required rows="2" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Tuliskan pengalaman positif Anda..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Ada hambatan / kendala belajar? (Opsional)</label>
-            <textarea id="ref-kendala" rows="2" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Misal: Kurang paham materi tertentu, atau ada kendala fasilitas kelas..."></textarea>
-          </div>
-
-          <button type="submit" class="w-full py-3.5 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-            Kirim Refleksi Harian
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- ================= HALAMAN KHUSUS: FORM SARPRAS ================= -->
-    <section id="tab-form-sarpras" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
-      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-sky-100 custom-shadow">
-         <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-wrench"></i>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pelapor / Kelas</label>
+            <input type="text" id="sar-pelapor" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Contoh: Ahmad (XII TKR)">
           </div>
           <div>
-            <h2 class="font-bold text-slate-800 text-lg">Lapor Kerusakan Fasilitas</h2>
-            <p class="text-xs text-slate-500">Bantu kami menjaga kenyamanan lingkungan sekolah.</p>
-          </div>
-        </div>
-
-        <form id="form-sarpras" onsubmit="handleFormSarpras(event)" class="space-y-5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Lokasi Fasilitas *</label>
-              <input type="text" id="sar-lokasi" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Contoh: Toilet Lt. 2 Gedung B">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jenis Kerusakan *</label>
-              <select id="sar-jenis" required class="w-full text-sm p-3 border rounded-xl bg-white focus:ring-2 focus:ring-sky-500 outline-none text-slate-700">
-                <option value="" disabled selected>-- Pilih Jenis --</option>
-                <option value="Lampu / Kelistrikan Padam">Lampu / Kelistrikan Padam</option>
-                <option value="Pintu / Jendela Rusak">Pintu / Jendela Rusak</option>
-                <option value="Kran / Toilet Bocor">Kran / Sanitasi Toilet Bermasalah</option>
-                <option value="Kursi / Meja Patah">Kursi / Meja Rusak</option>
-                <option value="Proyektor / AC Kelas">Proyektor / Kipas / AC</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Deskripsi Detail Kerusakan *</label>
-            <textarea id="sar-deskripsi" required rows="3" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Jelaskan kondisi kerusakan secara rinci agar teknisi dapat membawa alat yang tepat..."></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Pelapor / Kelas</label>
-              <input type="text" id="sar-pelapor" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Nama Anda (Opsional)">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-2">Bukti Foto (Opsional)</label>
-              
-              <div class="flex gap-2 mb-3">
-                <button type="button" onclick="toggleBukti('sarpras', 'link')" id="btn-sarpras-link" class="flex-1 py-1.5 text-xs font-bold bg-sky-100 text-sky-700 rounded-lg border border-sky-200 transition-colors">🔗 Tautan</button>
-                <button type="button" onclick="toggleBukti('sarpras', 'file')" id="btn-sarpras-file" class="flex-1 py-1.5 text-xs font-bold bg-slate-50 text-slate-500 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">📁 Unggah</button>
-              </div>
-              
-              <div id="sarpras-bukti-link-container">
-                <input type="url" id="sarpras-bukti-link" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="https://drive.google.com/...">
-              </div>
-              
-              <div id="sarpras-bukti-file-container" class="hidden">
-                <input type="file" id="sarpras-bukti-file" accept="image/*" class="w-full text-sm p-1.5 border rounded-xl border-dashed border-2 border-sky-200 focus:ring-2 focus:ring-sky-500 outline-none bg-sky-50/50 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200 transition-all cursor-pointer">
-              </div>
-              <input type="hidden" id="sarpras-bukti-type" value="link">
-            </div>
-          </div>
-
-          <button type="submit" class="w-full py-3.5 mt-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-            Kirim Laporan Kerusakan
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- ================= HALAMAN KHUSUS: FORM KUDOS ================= -->
-    <section id="tab-form-kudos" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
-      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-amber-100 custom-shadow">
-         <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-gift"></i>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Lokasi Fasilitas *</label>
+            <input type="text" id="sar-lokasi" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Contoh: Toilet Gedung A, Lab Komputer">
           </div>
           <div>
-            <h2 class="font-bold text-slate-800 text-lg">Kirim Kudos (Apresiasi)</h2>
-            <p class="text-xs text-slate-500">Tebarkan energi positif dengan berterima kasih kepada warga sekolah.</p>
-          </div>
-        </div>
-
-        <form id="form-kudos" onsubmit="handleFormKudos(event)" class="space-y-5">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Dari Siapa? *</label>
-              <input type="text" id="kud-dari" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Nama / Inisial Anda">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Untuk Siapa? *</label>
-              <input type="text" id="kud-untuk" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Nama Teman / Guru">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Pilih Kategori Kebaikan *</label>
-            <select id="kud-kategori" required class="w-full text-sm p-3 border rounded-xl bg-white focus:ring-2 focus:ring-amber-500 outline-none text-slate-700">
-              <option value="" disabled selected>-- Pilih Kategori --</option>
-              <option value="🤝 Kerjasama Tim Hebat">🤝 Kerjasama Tim Hebat</option>
-              <option value="💖 Selalu Membantu & Ramah">💖 Selalu Membantu & Ramah</option>
-              <option value="💡 Inspiratif & Kreatif">💡 Inspiratif & Kreatif</option>
-              <option value="🎓 Pengajar / Mentor Terbaik">🎓 Pengajar / Mentor Terbaik</option>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Kerusakan *</label>
+            <select id="sar-jenis" required class="w-full text-sm p-3 border rounded-xl bg-white focus:ring-2 focus:ring-sky-500 outline-none">
+              <option value="" disabled selected>Pilih Jenis...</option>
+              <option value="Lampu / Kelistrikan">Lampu / Kelistrikan Padam</option>
+              <option value="Pintu / Jendela">Pintu / Jendela Rusak</option>
+              <option value="Sanitasi / Air">Kran / Sanitasi / Bocor</option>
+              <option value="Mebeler">Kursi / Meja Patah</option>
+              <option value="Elektronik AC/Proyektor">AC / Kipas / Proyektor</option>
+              <option value="Lainnya">Lainnya</option>
             </select>
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Pesan Apresiasi *</label>
-            <textarea id="kud-pesan" required rows="3" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Tuliskan ucapan penyemangat atau rasa terima kasih Anda..." maxlength="150"></textarea>
-            <p class="text-[10px] text-right text-slate-400 mt-1">Maksimal 150 karakter</p>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Deskripsi Detail *</label>
+            <textarea id="sar-deskripsi" required rows="3" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Jelaskan kondisi kerusakan secara spesifik..."></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-2">Foto Kerusakan (Opsional)</label>
+            <div class="flex gap-2 mb-3 bg-slate-100 p-1 rounded-lg w-max">
+              <button type="button" id="tab-url-sarpras" onclick="switchBuktiType('sarpras', 'url')" class="px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition">Pakai Tautan</button>
+              <button type="button" id="tab-file-sarpras" onclick="switchBuktiType('sarpras', 'file')" class="px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition">Unggah File</button>
+            </div>
+            
+            <div id="input-url-sarpras">
+              <input type="url" id="sarpras-bukti-url" class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="https://drive.google.com/...">
+            </div>
+            
+            <div id="input-file-sarpras" class="hidden">
+              <input type="file" id="sarpras-bukti-file" accept="image/*,.pdf" class="w-full text-sm p-2 border rounded-xl bg-slate-50 text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200 transition">
+              <p class="text-[10px] text-slate-400 mt-1">Maks. 2MB.</p>
+            </div>
           </div>
 
-          <button type="submit" class="w-full py-3.5 mt-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-            Kirim ke Dinding Apresiasi
-          </button>
+          <button type="submit" class="w-full py-3.5 mt-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-lg transition">Kirim Laporan Kerusakan</button>
         </form>
       </div>
     </section>
 
-    <!-- ================= HALAMAN KHUSUS: FORM MISI HABIT ================= -->
-    <section id="tab-form-misi" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
-      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-purple-100 custom-shadow">
-         <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-trophy"></i>
-          </div>
-          <div>
-            <h2 class="font-bold text-slate-800 text-lg">Misi Kebaikan Mandiri</h2>
-            <p class="text-xs text-slate-500">Klaim poin karakter dengan menyelesaikan kebiasaan positif di rumah.</p>
-          </div>
-        </div>
-
-        <form id="form-misi" onsubmit="handleFormMisi(event)" class="space-y-5">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Siswa *</label>
-              <input type="text" id="misi-nama" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kelas *</label>
-              <input type="text" id="misi-kelas" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Misi yang Selesai Hari Ini:</label>
-            <div class="space-y-3">
-              <label class="flex items-center justify-between p-3.5 border rounded-xl hover:bg-slate-50 cursor-pointer has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="misi-opsi" value="Membantu Pekerjaan Rumah Orang Tua|15" checked class="text-purple-600 focus:ring-purple-500 w-4 h-4">
-                  <span class="text-sm font-medium text-slate-700">Membantu Orang Tua (Nyapu/Masak/Cuci)</span>
-                </div>
-                <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-lg">+15 Poin</span>
-              </label>
-
-              <label class="flex items-center justify-between p-3.5 border rounded-xl hover:bg-slate-50 cursor-pointer has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="misi-opsi" value="Membaca Buku Non-Pelajaran 20 Menit|10" class="text-purple-600 focus:ring-purple-500 w-4 h-4">
-                  <span class="text-sm font-medium text-slate-700">Membaca Artikel / Buku (20 Menit)</span>
-                </div>
-                <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-lg">+10 Poin</span>
-              </label>
-
-              <label class="flex items-center justify-between p-3.5 border rounded-xl hover:bg-slate-50 cursor-pointer has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="misi-opsi" value="Merapikan Meja Belajar & Kamar|10" class="text-purple-600 focus:ring-purple-500 w-4 h-4">
-                  <span class="text-sm font-medium text-slate-700">Merapikan Kamar Sendiri</span>
-                </div>
-                <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-lg">+10 Poin</span>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" class="w-full py-3.5 mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-            Klaim Poin Kebaikan
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- ================= HALAMAN KHUSUS: CEK STATUS TRACKING ================= -->
-    <section id="tab-cek-status" class="hidden max-w-2xl mx-auto space-y-4">
-      <button onclick="switchTab('beranda')" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
-      </button>
-
+    <!-- ================= VIEW: REFLEKSI ================= -->
+    <section id="view-refleksi" class="hidden max-w-xl mx-auto px-4 sm:px-6 py-6">
+      <button onclick="goToView('beranda')" class="mb-4 text-xs font-semibold text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow">
-        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-magnifying-glass"></i>
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Check-Out Harian</h2>
+        <p class="text-xs text-slate-500 mb-6">Ceritakan perasaan dan kendalamu hari ini.</p>
+        <form id="form-refleksi" onsubmit="handleFormRefleksi(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <input type="text" id="ref-nama" required class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Nama *">
+            <input type="text" id="ref-kelas" required class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Kelas *">
           </div>
           <div>
-            <h2 class="font-bold text-slate-800 text-lg">Lacak Status Laporan</h2>
-            <p class="text-xs text-slate-500">Masukkan ID Aduan atau ID Sarpras untuk melihat perkembangannya.</p>
+            <label class="block text-xs font-semibold text-slate-600 mb-2">Perasaan hari ini? *</label>
+            <div class="grid grid-cols-4 gap-2">
+              <label class="cursor-pointer border border-slate-200 p-2 rounded-xl text-center hover:bg-slate-50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                <input type="radio" name="ref-emosi" value="Sangat Bahagia / Semangat" class="sr-only" checked>
+                <span class="text-2xl block mb-1">😄</span>
+                <span class="text-[10px] font-semibold text-slate-700">Semangat</span>
+              </label>
+              <label class="cursor-pointer border border-slate-200 p-2 rounded-xl text-center hover:bg-slate-50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                <input type="radio" name="ref-emosi" value="Biasa Saja / Tenang" class="sr-only">
+                <span class="text-2xl block mb-1">🙂</span>
+                <span class="text-[10px] font-semibold text-slate-700">Biasa</span>
+              </label>
+              <label class="cursor-pointer border border-slate-200 p-2 rounded-xl text-center hover:bg-slate-50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                <input type="radio" name="ref-emosi" value="Lelah / Capek" class="sr-only">
+                <span class="text-2xl block mb-1">🥱</span>
+                <span class="text-[10px] font-semibold text-slate-700">Lelah</span>
+              </label>
+              <label class="cursor-pointer border border-slate-200 p-2 rounded-xl text-center hover:bg-slate-50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                <input type="radio" name="ref-emosi" value="Cemas / Sedih" class="sr-only">
+                <span class="text-2xl block mb-1">😔</span>
+                <span class="text-[10px] font-semibold text-slate-700">Cemas</span>
+              </label>
+            </div>
           </div>
-        </div>
-
-        <form id="form-cek-status" onsubmit="handleCekStatus(event)" class="space-y-4">
-          <div class="flex flex-col sm:flex-row gap-3">
-            <input type="text" id="track-id" required class="flex-1 text-sm p-3.5 border rounded-xl focus:ring-2 focus:ring-slate-500 outline-none uppercase font-mono" placeholder="Contoh: ADU-2208-1234">
-            <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
-              Lacak
-            </button>
-          </div>
+          <textarea id="ref-catatan" required rows="2" class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Materi / Kegiatan yang disukai hari ini..."></textarea>
+          <textarea id="ref-kendala" rows="2" class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Hambatan / Kendala belajar hari ini..."></textarea>
+          <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl">Kirim Refleksi</button>
         </form>
-
-        <div id="track-result" class="mt-6 hidden"></div>
       </div>
     </section>
 
-    <!-- ================= TAB 5: PANEL ADMIN ================= -->
-    <section id="tab-admin" class="hidden space-y-6">
+    <!-- ================= VIEW: KUDOS ================= -->
+    <section id="view-kudos" class="hidden max-w-xl mx-auto px-4 sm:px-6 py-6">
+      <button onclick="goToView('beranda')" class="mb-4 text-xs font-semibold text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow">
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Kirim Apresiasi (Kudos)</h2>
+        <form id="form-kudos" onsubmit="handleFormKudos(event)" class="space-y-4 mt-6">
+          <div class="grid grid-cols-2 gap-4">
+            <input type="text" id="kud-dari" required class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Dari (Inisial/Nama)">
+            <input type="text" id="kud-untuk" required class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Untuk Siapa?">
+          </div>
+          <select id="kud-kategori" required class="w-full text-sm p-3 border rounded-xl bg-white outline-none">
+            <option value="" disabled selected>Pilih Kategori Apresiasi...</option>
+            <option value="🤝 Tim Hebat">🤝 Kerjasama Tim Hebat</option>
+            <option value="💖 Baik Hati">💖 Baik Hati & Ramah</option>
+            <option value="💡 Inspiratif">💡 Inspiratif & Kreatif</option>
+            <option value="🎓 Guru Terbaik">🎓 Guru / Mentor Terbaik</option>
+          </select>
+          <textarea id="kud-pesan" required rows="3" class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Tuliskan ucapan terima kasih..."></textarea>
+          <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl">Kirim ke Wall</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= VIEW: MISI ================= -->
+    <section id="view-misi" class="hidden max-w-xl mx-auto px-4 sm:px-6 py-6">
+      <button onclick="goToView('beranda')" class="mb-4 text-xs font-semibold text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow">
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Misi Habit Positif</h2>
+        <form id="form-misi" onsubmit="handleFormMisi(event)" class="space-y-4 mt-6">
+          <div class="grid grid-cols-2 gap-4">
+            <input type="text" id="misi-nama" required class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Nama Lengkap *">
+            <input type="text" id="misi-kelas" required class="w-full text-sm p-3 border rounded-xl outline-none" placeholder="Kelas *">
+          </div>
+          <div class="space-y-3">
+            <label class="flex items-center justify-between p-3 border rounded-xl cursor-pointer has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="misi-opsi" value="Bantu Orang Tua|15" checked class="w-4 h-4 text-purple-600">
+                <span class="text-xs font-medium text-slate-700">Membantu Orang Tua (Rumah)</span>
+              </div>
+              <span class="text-xs font-bold text-purple-600">+15 Poin</span>
+            </label>
+            <label class="flex items-center justify-between p-3 border rounded-xl cursor-pointer has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="misi-opsi" value="Baca Buku|10" class="w-4 h-4 text-purple-600">
+                <span class="text-xs font-medium text-slate-700">Membaca Buku (20 Menit)</span>
+              </div>
+              <span class="text-xs font-bold text-purple-600">+10 Poin</span>
+            </label>
+          </div>
+          <button type="submit" class="w-full py-3.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl">Klaim Poin</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= VIEW: LACAK STATUS ================= -->
+    <section id="view-lacak" class="hidden max-w-xl mx-auto px-4 sm:px-6 py-6">
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 custom-shadow text-center">
+        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Cek Status Laporan</h2>
+        <p class="text-xs text-slate-500 mb-6">Masukkan ID Resi / Laporan (Aduan atau Sarpras)</p>
+        
+        <form onsubmit="handleLacak(event)" class="flex gap-2">
+          <input type="text" id="input-lacak" required class="flex-grow text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none uppercase font-mono" placeholder="Misal: ADU-1208-4321">
+          <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition">Cek</button>
+        </form>
+
+        <div id="hasil-lacak" class="mt-6 text-left hidden">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW: ADMIN & TIM BSAN DASHBOARD ================= -->
+    <section id="view-admin" class="hidden px-4 sm:px-6 py-6 space-y-6">
       <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 custom-shadow gap-4">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl">
-            <i class="fa-solid fa-user-tie"></i>
-          </div>
+          <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-user-tie"></i></div>
           <div>
-            <span id="admin-badge-role" class="px-2 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded-md uppercase">Role</span>
-            <h2 id="admin-welcome-name" class="text-lg font-bold text-slate-800 mt-1">Dashboard Petugas</h2>
+            <span id="admin-badge-role" class="px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded-md uppercase">Role</span>
+            <h2 id="admin-welcome-name" class="text-base font-bold text-slate-800 mt-1">Dashboard</h2>
+            <p id="admin-divisi-sk" class="text-[11px] text-slate-500 font-medium">Divisi SK</p>
           </div>
         </div>
         <div class="flex gap-2">
-          <button onclick="logoutAdmin()" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-semibold transition">
-            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+          <button onclick="openJurnalModal()" id="btn-open-jurnal" class="px-3.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-book-pen"></i> Tulis Jurnal Divisi
+          </button>
+          <button onclick="logoutAdmin()" class="px-3.5 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-semibold transition">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar
           </button>
         </div>
       </div>
 
-      <!-- Admin Sub Tabs -->
+      <!-- Admin Sub Tabs (RBAC Visible Based on Role) -->
       <div class="flex overflow-x-auto hide-scrollbar border-b border-slate-200 gap-4 text-xs font-semibold">
         <button onclick="switchAdminSubTab('aduan')" id="btn-sub-aduan" class="pb-2 border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap">Aduan Masuk</button>
         <button onclick="switchAdminSubTab('bk')" id="btn-sub-bk" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">Jadwal BK</button>
         <button onclick="switchAdminSubTab('sarpras')" id="btn-sub-sarpras" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">Laporan Sarpras</button>
         <button onclick="switchAdminSubTab('refleksi')" id="btn-sub-refleksi" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">Rekap Refleksi</button>
         <button onclick="switchAdminSubTab('misi')" id="btn-sub-misi" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">Rekap Misi</button>
+        <button onclick="switchAdminSubTab('jurnal')" id="btn-sub-jurnal" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">Buku Kerja Tim</button>
       </div>
 
-      <!-- Admin Content Tables -->
-      <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden custom-shadow">
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden custom-shadow">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs whitespace-nowrap md:whitespace-normal">
-            <thead id="admin-table-head" class="bg-slate-50 border-b border-slate-200 text-slate-600">
-              <!-- Rendered via JS -->
-            </thead>
-            <tbody id="admin-table-body" class="divide-y divide-slate-100 text-slate-700">
-              <!-- Rendered via JS -->
-            </tbody>
+          <table class="w-full text-left text-xs whitespace-nowrap md:whitespace-normal">
+            <thead id="admin-table-head" class="bg-slate-50 border-b border-slate-200 text-slate-600"></thead>
+            <tbody id="admin-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
           </table>
         </div>
       </div>
@@ -660,162 +501,171 @@
 
   </main>
 
-  <!-- ================= MODAL LOGIN PETUGAS ================= -->
-  <div id="modal-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform transition-all scale-100">
+  <!-- MODAL LOGIN PETUGAS -->
+  <div id="modal-login" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
       <div class="text-center mb-6">
-        <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mx-auto mb-3">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-        <h3 class="font-bold text-slate-800 text-lg">Akses Petugas & Guru</h3>
-        <p class="text-xs text-slate-500 mt-1">Silakan masuk untuk mengelola data sistem.</p>
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mx-auto mb-3"><i class="fa-solid fa-lock"></i></div>
+        <h3 class="font-bold text-slate-800 text-lg">Akses Petugas & Tim BSAN</h3>
       </div>
-
       <form id="form-login" onsubmit="handleLoginPetugas(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
-          <input type="text" id="login-username" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan username" autocomplete="off">
+          <input type="text" id="login-username" required class="w-full text-sm p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Masukkan username">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">PIN / Password</label>
-          <input type="password" id="login-pin" required class="w-full text-sm p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan PIN / password">
+          <input type="password" id="login-pin" required class="w-full text-sm p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Masukkan PIN">
         </div>
-        <button type="submit" id="btn-submit-login" class="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow transition">
-          Masuk Dashboard
-        </button>
+        <button type="submit" class="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow transition">Masuk Dashboard</button>
       </form>
-
-      <button onclick="closeAdminModal()" class="w-full mt-4 py-2 text-slate-500 hover:text-slate-700 text-xs font-medium transition">
-        Batal
-      </button>
+      <button onclick="closeAdminModal()" class="w-full mt-4 py-2 text-slate-500 hover:text-slate-700 text-xs font-medium">Batal</button>
     </div>
   </div>
 
-  <!-- ================= MODAL NOTIFIKASI ID TRACKING ================= -->
-  <div id="modal-tracking-info" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center transform transition-all scale-100">
-      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4">
-        <i class="fa-solid fa-check-double"></i>
+  <!-- MODAL TULIS JURNAL DIVISI -->
+  <div id="modal-jurnal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-slate-800 text-base"><i class="fa-solid fa-book-pen text-emerald-600 mr-2"></i> Buat Jurnal Kegiatan Divisi</h3>
+        <button onclick="closeJurnalModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-      <h3 class="font-bold text-slate-800 text-lg mb-2">Laporan Terkirim!</h3>
-      <p class="text-xs text-slate-500 mb-4">Silakan salin ID di bawah ini untuk melacak status penanganan laporan Anda di menu <b class="text-slate-700">Cek Status</b>.</p>
+      <form id="form-jurnal" onsubmit="handleFormJurnal(event)" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Petugas</label>
+            <input type="text" id="jurnal-petugas" readonly class="w-full text-xs p-2.5 bg-slate-100 border rounded-lg text-slate-600 font-semibold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Divisi SK</label>
+            <input type="text" id="jurnal-divisi" readonly class="w-full text-xs p-2.5 bg-slate-100 border rounded-lg text-slate-600 font-semibold">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Kegiatan / Program *</label>
+          <input type="text" id="jurnal-kegiatan" required class="w-full text-sm p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Misal: Sosialisasi Anti-Bullying / Patroli Zona Rawan">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Uraian Pelaksanaan Tugas *</label>
+          <textarea id="jurnal-uraian" required rows="3" class="w-full text-sm p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Jelaskan hasil kegiatan dan temuan di lapangan..."></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Link Dokumentasi / Foto (Opsional)</label>
+          <input type="url" id="jurnal-dok" class="w-full text-sm p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" placeholder="https://drive.google.com/...">
+        </div>
+        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow transition">Simpan Jurnal Divisi</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL RESI (TIKET) -->
+  <div id="modal-resi" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
+      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-check"></i></div>
+      <h3 class="font-bold text-slate-800 text-lg mb-1">Laporan Terkirim!</h3>
+      <p class="text-xs text-slate-500 mb-4">Simpan ID ini untuk melacak status penanganan secara mandiri.</p>
       
-      <div class="bg-slate-50 p-4 rounded-xl mb-6 flex items-center justify-between border border-slate-200">
-        <span id="tracking-id-display" class="font-mono font-bold text-slate-800 text-lg tracking-wider">ADU-XXXX</span>
-        <button onclick="copyTrackingId()" class="text-indigo-600 hover:text-indigo-800 p-2" title="Salin ID">
-          <i class="fa-regular fa-copy text-xl"></i>
-        </button>
+      <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 mb-4 flex items-center justify-between">
+        <span id="resi-id" class="font-mono font-bold text-slate-800 text-base tracking-wider">ADU-XXXX</span>
+        <button onclick="salinResi()" class="text-indigo-600 hover:text-indigo-800 px-2 py-1 bg-indigo-50 rounded text-xs font-bold"><i class="fa-regular fa-copy mr-1"></i> Salin</button>
       </div>
 
-      <button onclick="closeTrackingModal()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow transition">
-        Tutup & Kembali ke Beranda
-      </button>
+      <button onclick="closeResiModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl">Tutup & Kembali</button>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toast-container" class="fixed bottom-20 md:bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+  <div id="loading-overlay"><div class="bg-white p-4 rounded-xl shadow-xl flex items-center gap-3"><i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl"></i><span class="text-sm font-semibold text-slate-700">Memproses...</span></div></div>
 
-  <!-- LOADING OVERLAY -->
-  <div id="loading-overlay">
-    <div class="bg-white p-4 rounded-xl shadow-xl flex items-center gap-3">
-      <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl"></i>
-      <span class="text-sm font-semibold text-slate-700">Memproses...</span>
-    </div>
-  </div>
-
-  <!-- JAVASCRIPT LOGIC API INTEGRATION -->
   <script>
-    // URL API dari Google Apps Script yang baru Anda Deploy
     const API_URL = "https://script.google.com/macros/s/AKfycbwWJB2dZie2ZvmAbuJLJogRD4mtYDMNVGA7CNfSTb_sjzDUV8Z83aSMz-bZ12ewiQ3g/exec";
 
     let loggedUser = null;
     let activeSubTab = 'aduan';
+    let currentAdminData = null;
 
-    window.addEventListener('DOMContentLoaded', () => {
-      loadPublicFeed();
-    });
+    window.addEventListener('DOMContentLoaded', () => { loadPublicFeed(); });
 
-    // Helper: Fungsi Panggilan API (Fetch REST)
-    async function callAPI(action, data = {}) {
+    async function callAPI(action, dataObj = {}) {
       try {
-        // Menggunakan fetch standar dengan header text/plain eksplisit
-        // dan redirect 'follow' untuk melintasi sistem redirect HTTP 302 dari Google
         const response = await fetch(API_URL, {
           method: 'POST',
-          redirect: 'follow', // Wajib untuk mengikuti redirect dari Google Apps Script
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
-          },
-          body: JSON.stringify({ action: action, data: data })
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, data: dataObj })
         });
-        
-        if (!response.ok) {
-           throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        return result;
+        if (!response.ok) throw new Error("Gagal terhubung ke server.");
+        return await response.json();
       } catch (error) {
-        // Menggunakan console.warn agar tidak memicu pop-up error merah di Canvas
-        // Error ini wajar jika URL GAS belum disetting "Anyone" atau script GAS sedang crash.
-        console.warn('Status Koneksi API:', error.message);
-        return { success: false, message: 'Gagal terhubung. Pastikan URL Apps Script benar, diset akses "Anyone", dan Script menempel di Google Sheets (Bukan Standalone).' };
+        console.warn("API Fetch Error:", error);
+        return { success: false, message: "Terjadi kesalahan jaringan." };
       }
     }
 
-    function switchTab(tabId) {
-      const allPages = ['beranda', 'admin', 'form-aduan', 'form-bk', 'form-refleksi', 'form-sarpras', 'form-kudos', 'form-misi', 'cek-status'];
-      allPages.forEach(t => {
-        const el = document.getElementById(`tab-${t}`);
-        if (el) el.classList.add('hidden');
+    function goToView(viewId) {
+      const views = ['beranda', 'aduan', 'bk', 'sarpras', 'refleksi', 'kudos', 'misi', 'lacak', 'admin'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if(el) el.classList.add('hidden');
       });
+      const target = document.getElementById(`view-${viewId}`);
+      if(target) target.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      const activeEl = document.getElementById(`tab-${tabId}`);
-      if (activeEl) {
-        activeEl.classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      if (tabId === 'beranda') loadPublicFeed();
-      else if (tabId === 'admin' && loggedUser) loadAdminData();
+      if (viewId === 'beranda') loadPublicFeed();
+      if (viewId === 'admin') loadAdminData();
     }
 
-    function toggleAnonim(checkbox) {
-      const identitasBox = document.getElementById('identitas-aduan');
-      const nisn = document.getElementById('aduan-nisn');
-      const nama = document.getElementById('aduan-nama');
-      const kelas = document.getElementById('aduan-kelas');
+    function toggleLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
+    
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-indigo-600');
+      const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+      
+      toast.className = `${bg} text-white text-xs px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 transform transition-all translate-y-4 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+      container.appendChild(toast);
+      
+      setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
 
+    function switchBuktiType(formType, type) {
+      const isUrl = type === 'url';
+      document.getElementById(`input-url-${formType}`).style.display = isUrl ? 'block' : 'none';
+      document.getElementById(`input-file-${formType}`).style.display = isUrl ? 'none' : 'block';
+      
+      const tabUrl = document.getElementById(`tab-url-${formType}`);
+      const tabFile = document.getElementById(`tab-file-${formType}`);
+      
+      if(isUrl){
+        tabUrl.className = "px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition";
+        tabFile.className = "px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition";
+        document.getElementById(`${formType}-bukti-file`).value = "";
+      } else {
+        tabFile.className = "px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition";
+        tabUrl.className = "px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition";
+        document.getElementById(`${formType}-bukti-url`).value = "";
+      }
+    }
+
+    function toggleAnonim(checkbox, containerId, inputsToClear) {
+      const container = document.getElementById(containerId);
       if (checkbox.checked) {
-        identitasBox.classList.add('opacity-40', 'pointer-events-none');
-        nisn.value = ''; nama.value = ''; kelas.value = '';
+        container.classList.add('opacity-40', 'pointer-events-none');
+        inputsToClear.forEach(id => document.getElementById(id).value = '');
       } else {
-        identitasBox.classList.remove('opacity-40', 'pointer-events-none');
+        container.classList.remove('opacity-40', 'pointer-events-none');
       }
     }
 
-    function toggleBukti(formType, mode) {
-      const typeInput = document.getElementById(`${formType}-bukti-type`);
-      const linkContainer = document.getElementById(`${formType}-bukti-link-container`);
-      const fileContainer = document.getElementById(`${formType}-bukti-file-container`);
-      const btnLink = document.getElementById(`btn-${formType}-link`);
-      const btnFile = document.getElementById(`btn-${formType}-file`);
-      const c = formType === 'aduan' ? 'rose' : 'sky';
-      typeInput.value = mode;
-
-      if (mode === 'link') {
-        linkContainer.classList.remove('hidden'); fileContainer.classList.add('hidden');
-        btnLink.className = `flex-1 py-2 text-xs font-bold bg-${c}-100 text-${c}-700 rounded-lg border border-${c}-200 transition-colors`;
-        btnFile.className = `flex-1 py-2 text-xs font-bold bg-slate-50 text-slate-500 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors`;
-      } else {
-        linkContainer.classList.add('hidden'); fileContainer.classList.remove('hidden');
-        btnFile.className = `flex-1 py-2 text-xs font-bold bg-${c}-100 text-${c}-700 rounded-lg border border-${c}-200 transition-colors`;
-        btnLink.className = `flex-1 py-2 text-xs font-bold bg-slate-50 text-slate-500 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors`;
-      }
-    }
-
-    function getBase64(file) {
+    async function getBase64(file) {
+      if(!file) return null;
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -824,43 +674,46 @@
       });
     }
 
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const bgColors = { success: 'bg-emerald-600 text-white', error: 'bg-rose-600 text-white', info: 'bg-indigo-600 text-white' };
-      toast.className = `${bgColors[type] || bgColors.info} text-xs px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0`;
-      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-circle-exclamation' : 'fa-info-circle')}"></i> <span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
-      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-4'); setTimeout(() => toast.remove(), 300); }, 3000);
+    function getBuktiData(formType) {
+      return new Promise(async (resolve) => {
+        const urlInput = document.getElementById(`${formType}-bukti-url`).value;
+        const fileInput = document.getElementById(`${formType}-bukti-file`).files[0];
+        
+        if (fileInput) {
+          if (fileInput.size > 2097152) { showToast("Maksimal ukuran file 2MB", "error"); resolve(null); return; }
+          const b64 = await getBase64(fileInput);
+          resolve(b64);
+        } else {
+          resolve(urlInput || '-');
+        }
+      });
     }
 
-    function toggleLoading(show) {
-      document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+    function showResiModal(id) {
+      document.getElementById('resi-id').innerText = id;
+      document.getElementById('modal-resi').classList.remove('hidden');
+    }
+    
+    function closeResiModal() {
+      document.getElementById('modal-resi').classList.add('hidden');
+      goToView('beranda');
+    }
+    
+    function salinResi() {
+      const id = document.getElementById('resi-id').innerText;
+      document.execCommand('copy');
+      navigator.clipboard.writeText(id).catch(() => {});
+      showToast('ID Resi disalin!', 'success');
     }
 
-    // ================= HANDLERS FORM SISWA =================
-
+    // --- Form Handlers ---
     async function handleFormAduan(e) {
       e.preventDefault();
+      const buktiRaw = await getBuktiData('aduan');
+      if (buktiRaw === null) return;
+
       toggleLoading(true);
       const isAnon = document.getElementById('aduan-anonim').checked;
-      
-      let linkBukti = '-';
-      const buktiType = document.getElementById('aduan-bukti-type').value;
-      if (buktiType === 'link') {
-        linkBukti = document.getElementById('aduan-bukti-link').value || '-';
-      } else {
-        const fileInput = document.getElementById('aduan-bukti-file');
-        if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          if (file.size > 2 * 1024 * 1024) {
-            showToast('Ukuran file maksimal 2MB', 'error'); toggleLoading(false); return;
-          }
-          linkBukti = await getBase64(file);
-        }
-      }
-
       const dataObj = {
         isAnonim: isAnon,
         nisn: document.getElementById('aduan-nisn').value,
@@ -868,18 +721,18 @@
         kelas: document.getElementById('aduan-kelas').value,
         kategori: document.getElementById('aduan-kategori').value,
         kronologi: document.getElementById('aduan-kronologi').value,
-        bukti: linkBukti
+        bukti: buktiRaw
       };
 
       const res = await callAPI('submitAduan', dataObj);
       toggleLoading(false);
-      if(res.success) {
+      
+      if (res.success) {
         document.getElementById('form-aduan').reset();
-        toggleBukti('aduan', 'link'); 
-        toggleAnonim(document.getElementById('aduan-anonim')); 
-        switchTab('beranda');
-        showTrackingModal(res.id);
-      } else showToast(res.message, 'error');
+        document.getElementById('aduan-anonim').checked = false;
+        toggleAnonim(document.getElementById('aduan-anonim'), 'identitas-aduan', []);
+        showResiModal(res.id);
+      } else { showToast(res.message, 'error'); }
     }
 
     async function handleFormBK(e) {
@@ -895,317 +748,325 @@
       };
       const res = await callAPI('submitJanjiBK', dataObj);
       toggleLoading(false);
-      if(res.success) { showToast(res.message, 'success'); document.getElementById('form-bk').reset(); switchTab('beranda'); }
-      else showToast(res.message, 'error');
+      
+      if (res.success) {
+        showToast(res.message, 'success');
+        document.getElementById('form-bk').reset();
+        goToView('beranda');
+      } else { showToast(res.message, 'error'); }
+    }
+
+    async function handleFormSarpras(e) {
+      e.preventDefault();
+      const buktiRaw = await getBuktiData('sarpras');
+      if (buktiRaw === null) return;
+
+      toggleLoading(true);
+      const dataObj = {
+        pelapor: document.getElementById('sar-pelapor').value,
+        lokasi: document.getElementById('sar-lokasi').value,
+        jenis: document.getElementById('sar-jenis').value,
+        deskripsi: document.getElementById('sar-deskripsi').value,
+        foto: buktiRaw
+      };
+
+      const res = await callAPI('submitSarpras', dataObj);
+      toggleLoading(false);
+      
+      if (res.success) {
+        document.getElementById('form-sarpras').reset();
+        showResiModal(res.id);
+      } else { showToast(res.message, 'error'); }
     }
 
     async function handleFormRefleksi(e) {
       e.preventDefault();
       toggleLoading(true);
       const emosiEl = document.querySelector('input[name="ref-emosi"]:checked');
-      const dataObj = {
+      const res = await callAPI('submitRefleksi', {
         nama: document.getElementById('ref-nama').value,
         kelas: document.getElementById('ref-kelas').value,
-        emosi: emosiEl ? emosiEl.value : 'Biasa Saja',
+        emosi: emosiEl ? emosiEl.value : 'Biasa',
         catatan: document.getElementById('ref-catatan').value,
         kendala: document.getElementById('ref-kendala').value
-      };
-      const res = await callAPI('submitRefleksi', dataObj);
+      });
       toggleLoading(false);
-      if(res.success) { showToast(res.message, 'success'); document.getElementById('form-refleksi').reset(); switchTab('beranda'); }
-      else showToast(res.message, 'error');
-    }
-
-    async function handleFormSarpras(e) {
-      e.preventDefault();
-      toggleLoading(true);
-
-      let linkBukti = '-';
-      const buktiType = document.getElementById('sarpras-bukti-type').value;
-      if (buktiType === 'link') { linkBukti = document.getElementById('sarpras-bukti-link').value || '-'; }
-      else {
-        const fileInput = document.getElementById('sarpras-bukti-file');
-        if (fileInput.files.length > 0) {
-          if (fileInput.files[0].size > 2 * 1024 * 1024) { showToast('Ukuran file maks 2MB', 'error'); toggleLoading(false); return; }
-          linkBukti = await getBase64(fileInput.files[0]);
-        }
-      }
-
-      const dataObj = {
-        pelapor: document.getElementById('sar-pelapor').value,
-        lokasi: document.getElementById('sar-lokasi').value,
-        jenis: document.getElementById('sar-jenis').value,
-        deskripsi: document.getElementById('sar-deskripsi').value,
-        foto: linkBukti
-      };
-      const res = await callAPI('submitSarpras', dataObj);
-      toggleLoading(false);
-      if(res.success) {
-        document.getElementById('form-sarpras').reset();
-        toggleBukti('sarpras', 'link');
-        switchTab('beranda');
-        showTrackingModal(res.id);
-      } else showToast(res.message, 'error');
+      if (res.success) { showToast(res.message, 'success'); document.getElementById('form-refleksi').reset(); goToView('beranda'); } 
+      else { showToast(res.message, 'error'); }
     }
 
     async function handleFormKudos(e) {
       e.preventDefault();
       toggleLoading(true);
-      const dataObj = {
+      const res = await callAPI('submitKudos', {
         dari: document.getElementById('kud-dari').value,
         untuk: document.getElementById('kud-untuk').value,
         kategori: document.getElementById('kud-kategori').value,
         pesan: document.getElementById('kud-pesan').value
-      };
-      const res = await callAPI('submitKudos', dataObj);
+      });
       toggleLoading(false);
-      if(res.success) { showToast(res.message, 'success'); document.getElementById('form-kudos').reset(); switchTab('beranda'); }
-      else showToast(res.message, 'error');
+      if (res.success) { showToast(res.message, 'success'); document.getElementById('form-kudos').reset(); goToView('beranda'); } 
+      else { showToast(res.message, 'error'); }
     }
 
     async function handleFormMisi(e) {
       e.preventDefault();
       toggleLoading(true);
       const opsiRaw = document.querySelector('input[name="misi-opsi"]:checked').value.split('|');
-      const dataObj = {
+      const res = await callAPI('submitMisi', {
         nama: document.getElementById('misi-nama').value,
         kelas: document.getElementById('misi-kelas').value,
         aktivitas: opsiRaw[0],
         poin: parseInt(opsiRaw[1])
-      };
-      const res = await callAPI('submitMisi', dataObj);
+      });
       toggleLoading(false);
-      if(res.success) { showToast(res.message, 'success'); switchTab('beranda'); }
-      else showToast(res.message, 'error');
+      if (res.success) { showToast(res.message, 'success'); goToView('beranda'); } 
+      else { showToast(res.message, 'error'); }
     }
 
-    // ================= FUNGSI TRACKING =================
-    
-    function showTrackingModal(id) {
-      document.getElementById('tracking-id-display').innerText = id;
-      document.getElementById('modal-tracking-info').classList.remove('hidden');
-    }
-    function closeTrackingModal() { document.getElementById('modal-tracking-info').classList.add('hidden'); }
-    function copyTrackingId() {
-      const idText = document.getElementById('tracking-id-display').innerText;
-      const el = document.createElement('textarea'); el.value = idText;
-      document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-      showToast('ID berhasil disalin!', 'success');
-    }
-
-    async function handleCekStatus(e) {
+    async function handleFormJurnal(e) {
       e.preventDefault();
       toggleLoading(true);
-      const searchId = document.getElementById('track-id').value.trim().toUpperCase();
-      const res = await callAPI('checkTrackingStatus', { searchId: searchId });
+      const dataObj = {
+        petugas: loggedUser.nama,
+        divisi: loggedUser.divisi,
+        kegiatan: document.getElementById('jurnal-kegiatan').value,
+        uraian: document.getElementById('jurnal-uraian').value,
+        dokumentasi: document.getElementById('jurnal-dok').value || '-'
+      };
+      const res = await callAPI('submitJurnalTim', dataObj);
+      toggleLoading(false);
+      if (res.success) {
+        showToast(res.message, 'success');
+        document.getElementById('form-jurnal').reset();
+        closeJurnalModal();
+        loadAdminData();
+      } else { showToast(res.message, 'error'); }
+    }
+
+    async function handleLacak(e) {
+      e.preventDefault();
+      const idSearch = document.getElementById('input-lacak').value.trim().toUpperCase();
+      if (!idSearch) return;
+
+      toggleLoading(true);
+      const res = await callAPI('checkTrackingStatus', { searchId: idSearch });
       toggleLoading(false);
       
-      const resultBox = document.getElementById('track-result');
-      resultBox.classList.remove('hidden');
+      const container = document.getElementById('hasil-lacak');
+      container.classList.remove('hidden');
       
       if (res.success && res.found) {
-        const foundData = res.data;
-        const isDone = foundData.status.includes('Selesai');
-        resultBox.innerHTML = `
-          <div class="p-5 border border-indigo-100 bg-indigo-50/40 rounded-2xl space-y-4 relative overflow-hidden">
-            <div class="absolute right-0 top-0 opacity-5 pointer-events-none translate-x-4 -translate-y-4">
-               <i class="fa-solid fa-magnifying-glass text-8xl"></i>
+        const isSelesai = res.data.status.includes('Selesai') || res.data.status.includes('Diperbaiki');
+        let buktiHtml = '';
+        const lampiran = res.data.bukti !== '-' ? res.data.bukti : res.data.foto;
+        if (lampiran && lampiran !== '-') {
+          buktiHtml = `<a href="${lampiran}" target="_blank" class="text-[10px] bg-slate-100 px-2.5 py-1.5 inline-block mt-2 rounded font-bold text-indigo-600 hover:bg-indigo-50"><i class="fa-solid fa-paperclip mr-1"></i> Buka Lampiran Bukti</a>`;
+        }
+        
+        container.innerHTML = `
+          <div class="p-4 border border-slate-200 rounded-xl bg-slate-50">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">${res.type}</span>
+              <span class="px-2.5 py-1 text-[10px] font-bold rounded ${isSelesai ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${res.data.status}</span>
             </div>
-            <div class="flex justify-between items-start relative z-10">
-              <span class="text-[10px] font-bold bg-indigo-200 text-indigo-800 px-2.5 py-1 rounded-md uppercase tracking-wider">${res.type}</span>
-              <span class="text-xs font-semibold text-slate-500">${new Date(foundData.waktu).toLocaleDateString('id-ID')}</span>
-            </div>
-            <div class="relative z-10">
-              <h4 class="font-bold text-slate-800 text-base mb-1">ID Tiket: <span class="font-mono text-indigo-600">${foundData.id}</span></h4>
-              <p class="text-xs text-slate-500 mb-2">Rincian Laporan:</p>
-              <p class="text-sm text-slate-700 italic border-l-4 border-indigo-300 pl-3 py-1 bg-white/50 rounded-r-lg">${foundData.deskripsi}</p>
-              
-              ${(foundData.bukti && foundData.bukti !== '-') ? `<a href="${foundData.bukti}" target="_blank" class="mt-3 inline-block px-3 py-1.5 bg-white border border-indigo-200 text-indigo-600 text-[10px] font-bold rounded-lg shadow-sm hover:bg-indigo-50 transition"><i class="fa-solid fa-paperclip mr-1"></i> Lihat Bukti Terlampir</a>` : ''}
-              ${(foundData.foto && foundData.foto !== '-') ? `<a href="${foundData.foto}" target="_blank" class="mt-3 inline-block px-3 py-1.5 bg-white border border-indigo-200 text-indigo-600 text-[10px] font-bold rounded-lg shadow-sm hover:bg-indigo-50 transition"><i class="fa-solid fa-image mr-1"></i> Lihat Foto Sarpras</a>` : ''}
-            </div>
-            <div class="pt-4 border-t border-indigo-100 flex items-center justify-between relative z-10">
-              <span class="text-xs font-bold text-slate-600">Status Penanganan:</span>
-              <span class="font-bold text-xs px-3 py-1.5 rounded-full ${isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700 shadow-sm border border-amber-200'}">
-                ${isDone ? '<i class="fa-solid fa-check mr-1"></i>' : '<i class="fa-solid fa-spinner fa-spin mr-1"></i>'}
-                ${foundData.status}
-              </span>
-            </div>
+            <p class="text-sm font-semibold text-slate-800 mb-1">ID: ${res.data.id}</p>
+            <p class="text-xs text-slate-600 italic mb-2">"${res.data.kronologi}"</p>
+            ${buktiHtml}
           </div>
         `;
       } else {
-        resultBox.innerHTML = `
-          <div class="p-6 border border-rose-100 bg-rose-50 rounded-2xl text-center shadow-inner">
-            <div class="w-12 h-12 rounded-full bg-rose-200 text-rose-600 flex items-center justify-center text-xl mx-auto mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h4 class="font-bold text-slate-800 text-sm">Laporan Tidak Ditemukan</h4>
-            <p class="text-xs text-slate-500 mt-1">Pastikan ID tiket sudah benar (contoh: ADU-xxxx atau SAR-xxxx).</p>
-          </div>
-        `;
+        container.innerHTML = `<div class="p-4 border border-rose-100 rounded-xl bg-rose-50 text-rose-600 text-xs font-semibold text-center">Data dengan ID tersebut tidak ditemukan.</div>`;
       }
     }
-
-    // ================= LOAD BERANDA FEED =================
 
     async function loadPublicFeed() {
       const res = await callAPI('getPublicFeed');
-      const kContainer = document.getElementById('kudos-stream');
-      const sContainer = document.getElementById('sarpras-quick-list');
+      if (res.success) {
+        const kContainer = document.getElementById('kudos-stream');
+        if (res.kudos.length === 0) kContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs col-span-2">Belum ada pesan.</div>`;
+        else kContainer.innerHTML = res.kudos.map(k => `
+          <div class="p-3.5 bg-amber-50/50 border border-amber-100 rounded-xl">
+            <div class="flex justify-between items-start mb-1"><span class="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">${k.kategori}</span></div>
+            <p class="text-xs text-slate-700 italic mb-2 font-medium line-clamp-3">"${k.pesan}"</p>
+            <div class="text-[10px] font-semibold text-slate-600 flex justify-between"><span>Untuk: <b>${k.untuk}</b></span><span class="font-normal text-slate-400">Oleh: ${k.dari}</span></div>
+          </div>
+        `).join('');
 
-      if(res.success) {
-        if (res.kudos.length === 0) kContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs col-span-2">Belum ada pesan. Jadilah yang pertama mengirim apresiasi!</div>`;
-        else {
-          kContainer.innerHTML = res.kudos.map(k => `
-            <div class="p-4 bg-amber-50 border border-amber-100 rounded-xl relative hover:shadow-md transition">
-              <div class="flex justify-between items-start mb-2">
-                <span class="text-[10px] font-bold text-amber-700 bg-amber-200/50 px-2 py-0.5 rounded">${k.kategori.split(' ')[1] || k.kategori}</span>
-                <span class="text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-0.5"></i> ${new Date(k.waktu).toLocaleDateString('id-ID')}</span>
-              </div>
-              <p class="text-sm text-slate-700 italic mb-3 font-medium">"${k.pesan}"</p>
-              <div class="text-xs font-semibold text-slate-600 flex items-center justify-between mt-auto">
-                <span>Untuk: <b class="text-slate-800">${k.untuk}</b></span><span class="text-[10px] text-slate-500 font-normal">Dari: ${k.dari}</span>
-              </div>
-            </div>`).join('');
-        }
-
-        if (res.sarpras.length === 0) sContainer.innerHTML = `<div class="text-center py-4 text-slate-400 text-xs">Semua fasilitas berfungsi optimal.</div>`;
-        else {
-          sContainer.innerHTML = res.sarpras.map(s => {
-            const isDone = s.status === 'Selesai' || s.status === 'Diperbaiki';
-            return `<div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-              <div class="truncate pr-3"><p class="text-xs font-semibold text-slate-800 truncate">${s.lokasi}</p><p class="text-[10px] text-slate-500 truncate">${s.jenis}</p></div>
-              <span class="text-[10px] font-bold px-2.5 py-1 rounded-md shrink-0 ${isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}">${s.status}</span>
-            </div>`}).join('');
-        }
-      } else {
-         kContainer.innerHTML = `<div class="text-center py-8 text-rose-500 text-xs col-span-2 bg-rose-50 rounded-xl border border-rose-100"><i class="fa-solid fa-triangle-exclamation mr-1"></i> API Error. Pastikan URL Apps Script sudah di-Deploy versi baru.</div>`;
-         sContainer.innerHTML = `<div class="text-center py-6 text-rose-500 text-xs bg-rose-50 rounded-xl border border-rose-100"><i class="fa-solid fa-triangle-exclamation mr-1"></i> API Error.</div>`;
+        const sContainer = document.getElementById('sarpras-quick-list');
+        if (res.sarpras.length === 0) sContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Fasilitas terpantau baik.</div>`;
+        else sContainer.innerHTML = res.sarpras.map(s => `
+          <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50">
+            <div class="truncate pr-2"><p class="text-[11px] font-bold text-slate-800 truncate">${s.lokasi}</p><p class="text-[9px] text-slate-500 truncate">${s.jenis}</p></div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded shrink-0 ${(s.status === 'Selesai' || s.status === 'Diperbaiki') ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}">${s.status}</span>
+          </div>
+        `).join('');
       }
     }
 
-    // ================= ADMIN DASHBOARD =================
-
+    // --- Admin & RBAC Logic ---
     function openAdminModal() {
-      if (loggedUser) switchTab('admin');
-      else { document.getElementById('modal-login').classList.remove('hidden'); setTimeout(() => document.getElementById('login-username').focus(), 100); }
+      if (loggedUser) goToView('admin'); else document.getElementById('modal-login').classList.remove('hidden');
     }
-    function closeAdminModal() { document.getElementById('modal-login').classList.add('hidden'); document.getElementById('form-login').reset(); }
+    
+    function closeAdminModal() { document.getElementById('modal-login').classList.add('hidden'); }
+
+    function openJurnalModal() {
+      document.getElementById('jurnal-petugas').value = loggedUser.nama;
+      document.getElementById('jurnal-divisi').value = loggedUser.divisi;
+      document.getElementById('modal-jurnal').classList.remove('hidden');
+    }
+
+    function closeJurnalModal() { document.getElementById('modal-jurnal').classList.add('hidden'); }
 
     async function handleLoginPetugas(e) {
       e.preventDefault();
       toggleLoading(true);
-      const u = document.getElementById('login-username').value.trim();
-      const p = document.getElementById('login-pin').value.trim();
-      const res = await callAPI('loginPetugas', { username: u, pin: p });
+      const res = await callAPI('loginPetugas', { 
+        username: document.getElementById('login-username').value.trim().toLowerCase(), 
+        pin: document.getElementById('login-pin').value.trim() 
+      });
       toggleLoading(false);
       
       if (res.success) {
-        loggedUser = res.user; closeAdminModal();
-        document.getElementById('btn-login-modal').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> <span>${loggedUser.nama}</span>`;
+        loggedUser = res.user; 
+        closeAdminModal();
+        document.getElementById('btn-login-modal').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> <span class="hidden sm:inline">${loggedUser.nama}</span>`;
         document.getElementById('admin-welcome-name').innerText = `Halo, ${loggedUser.nama}`;
         document.getElementById('admin-badge-role').innerText = loggedUser.role;
-        switchTab('admin'); showToast('Login berhasil.', 'success');
+        document.getElementById('admin-divisi-sk').innerText = `Divisi: ${loggedUser.divisi}`;
+
+        applyRBAC();
+        goToView('admin');
+        showToast('Login berhasil.', 'success');
       } else { showToast(res.message, 'error'); }
     }
 
     function logoutAdmin() {
-      loggedUser = null; document.getElementById('btn-login-modal').innerHTML = `<i class="fa-solid fa-user-shield text-slate-500"></i> <span>Petugas</span>`;
-      switchTab('beranda'); showToast('Berhasil keluar.', 'info');
+      loggedUser = null;
+      document.getElementById('btn-login-modal').innerHTML = `<i class="fa-solid fa-user-shield text-slate-500"></i> <span class="hidden sm:inline">Portal Petugas & Tim</span>`;
+      goToView('beranda');
+      showToast('Berhasil keluar.', 'info');
+    }
+
+    // Sesuai SK: Pembatasan Hak Akses Divisi (RBAC)
+    function applyRBAC() {
+      const role = loggedUser.role.toLowerCase();
+      const div = loggedUser.divisi.toLowerCase();
+
+      const isFullAccess = ['kepala sekolah', 'ketua tim bsan', 'admin', 'divisi monev'].some(r => role.includes(r));
+      const isSarpras = div.includes('sarpras') || role.includes('sarpras');
+      const isBK = div.includes('sekretaris') || role.includes('bk') || role.includes('perlindungan');
+
+      document.getElementById('btn-sub-aduan').style.display = (isFullAccess || isBK) ? '' : 'none';
+      document.getElementById('btn-sub-bk').style.display = (isFullAccess || isBK) ? '' : 'none';
+      document.getElementById('btn-sub-sarpras').style.display = (isFullAccess || isSarpras) ? '' : 'none';
+      document.getElementById('btn-sub-refleksi').style.display = (isFullAccess || isBK) ? '' : 'none';
+      document.getElementById('btn-sub-misi').style.display = isFullAccess ? '' : 'none';
+      document.getElementById('btn-sub-jurnal').style.display = ''; // Semua anggota tim bisa tulis & lihat jurnal
+
+      // Set default tab aktif berdasarkan peran
+      if (isSarpras && !isFullAccess && !isBK) { switchAdminSubTab('sarpras'); }
+      else if (isBK && !isFullAccess) { switchAdminSubTab('aduan'); }
+      else { switchAdminSubTab('aduan'); }
     }
 
     function switchAdminSubTab(sub) {
       activeSubTab = sub;
-      ['aduan', 'bk', 'sarpras', 'refleksi', 'misi'].forEach(s => {
+      ['aduan', 'bk', 'sarpras', 'refleksi', 'misi', 'jurnal'].forEach(s => {
         const btn = document.getElementById(`btn-sub-${s}`);
-        btn.className = (s === sub) ? 'pb-2 border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap' : 'pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap';
+        if(btn) btn.className = s === sub ? 'pb-2 border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap' : 'pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap';
       });
       loadAdminData();
     }
 
     async function loadAdminData() {
       if (!loggedUser) return;
-      const thead = document.getElementById('admin-table-head');
       const tbody = document.getElementById('admin-table-body');
-      tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengambil data dari server...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">Mengambil rekap data...</td></tr>`;
 
       const res = await callAPI('getAdminDashboardData');
-      if(!res.success) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-rose-500">Gagal memuat data.</td></tr>`; return; }
+      if (res.success) {
+        currentAdminData = res.data;
+        renderAdminTable();
+      } else { showToast(res.message, 'error'); tbody.innerHTML = ''; }
+    }
 
-      const dataObj = res.data;
+    function renderAdminTable() {
+      if (!currentAdminData) return;
+      const thead = document.getElementById('admin-table-head');
+      const tbody = document.getElementById('admin-table-body');
+
       if (activeSubTab === 'aduan') {
-        const data = dataObj.aduan;
-        thead.innerHTML = `<tr><th class="p-3">ID / Waktu</th><th class="p-3">Pelapor</th><th class="p-3">Kategori</th><th class="p-3">Kronologi</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>`;
-        if (data.length === 0) tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Belum ada laporan aduan.</td></tr>`;
-        else tbody.innerHTML = data.map(row => `
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-3 whitespace-nowrap"><span class="font-mono text-indigo-600 text-[11px]">${row[0]}</span><br><span class="text-[10px] text-slate-500">${new Date(row[1]).toLocaleDateString('id-ID')}</span></td>
-            <td class="p-3 whitespace-nowrap"><b>${row[3]}</b><br><span class="text-[10px] text-slate-500">${row[4]} | ${row[2]}</span></td>
-            <td class="p-3"><span class="px-2 py-1 bg-rose-50 text-rose-700 rounded-md whitespace-nowrap text-[11px]">${row[5]}</span></td>
-            <td class="p-3 max-w-xs md:max-w-md truncate" title="${row[6]}">${row[6]}
-              ${(row[7] && row[7] !== '-') ? `<br><a href="${row[7]}" target="_blank" class="mt-1 inline-block text-indigo-500 hover:underline text-[10px] font-semibold"><i class="fa-solid fa-paperclip"></i> Lihat Bukti</a>` : ''}
-            </td>
-            <td class="p-3 whitespace-nowrap"><span class="font-bold text-[10px] px-2 py-1 rounded-md ${row[8].includes('Selesai') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${row[8]}</span></td>
-            <td class="p-3 text-right whitespace-nowrap"><button onclick="promptStatus('ADUAN', '${row[0]}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg font-semibold text-[11px]">Ubah Status</button></td>
-          </tr>`).join('');
-      } else if (activeSubTab === 'bk') {
-        const data = dataObj.bk;
-        thead.innerHTML = `<tr><th class="p-3">ID Konseling</th><th class="p-3">Nama Siswa</th><th class="p-3">Jadwal Diminta</th><th class="p-3">Topik</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>`;
-        if (data.length === 0) tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Belum ada janji konseling.</td></tr>`;
-        else tbody.innerHTML = data.map(row => `
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-3 text-[11px] font-mono text-indigo-600 whitespace-nowrap">${row[0]}</td>
-            <td class="p-3 whitespace-nowrap"><b>${row[3]}</b> <span class="text-xs text-slate-500">(${row[4]})</span></td>
-            <td class="p-3 whitespace-nowrap">${row[5]} <br><span class="text-indigo-600 font-bold text-[11px]">${row[6]}</span></td>
-            <td class="p-3 max-w-xs truncate">${row[7]}</td>
-            <td class="p-3 whitespace-nowrap"><span class="font-bold text-[10px] px-2 py-1 rounded-md ${row[8] === 'Disetujui' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}">${row[8]}</span></td>
-            <td class="p-3 text-right whitespace-nowrap"><button onclick="promptStatus('BK', '${row[0]}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg font-semibold text-[11px]">Respon</button></td>
-          </tr>`).join('');
-      } else if (activeSubTab === 'sarpras') {
-        const data = dataObj.sarpras;
-        thead.innerHTML = `<tr><th class="p-3">ID Sarpras</th><th class="p-3">Lokasi</th><th class="p-3">Kerusakan & Deskripsi</th><th class="p-3">Pelapor</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>`;
-        if (data.length === 0) tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Belum ada laporan sarpras.</td></tr>`;
-        else tbody.innerHTML = data.map(row => `
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-3 text-[11px] font-mono text-sky-600 whitespace-nowrap">${row[0]}</td>
-            <td class="p-3 font-bold whitespace-nowrap">${row[3]}</td>
-            <td class="p-3"><div class="text-[11px] font-semibold text-sky-600">${row[4]}</div><div class="max-w-xs truncate text-slate-600" title="${row[5]}">${row[5]}</div>
-              ${(row[6] && row[6] !== '-') ? `<a href="${row[6]}" target="_blank" class="mt-1 inline-block text-sky-500 hover:underline text-[10px] font-semibold"><i class="fa-solid fa-image"></i> Buka Foto</a>` : ''}
-            </td>
-            <td class="p-3 text-xs text-slate-500 whitespace-nowrap">${row[2]}</td>
-            <td class="p-3 whitespace-nowrap"><span class="font-bold text-[10px] px-2 py-1 rounded-md ${(row[7] === 'Selesai' || row[7] === 'Diperbaiki') ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}">${row[7]}</span></td>
-            <td class="p-3 text-right whitespace-nowrap"><button onclick="promptStatus('SARPRAS', '${row[0]}')" class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded-lg font-semibold text-[11px]">Update</button></td>
-          </tr>`).join('');
-      } else if (activeSubTab === 'refleksi') {
-        const data = dataObj.refleksi;
-        thead.innerHTML = `<tr><th class="p-3">Waktu</th><th class="p-3">Siswa</th><th class="p-3">Emosi</th><th class="p-3">Catatan Pembelajaran</th><th class="p-3">Hambatan Belajar</th></tr>`;
-        if (data.length === 0) tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Belum ada data refleksi.</td></tr>`;
-        else tbody.innerHTML = data.map(row => `
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-3 text-[11px] text-slate-500 whitespace-nowrap">${new Date(row[1]).toLocaleDateString('id-ID')}</td>
-            <td class="p-3 whitespace-nowrap"><b>${row[3]}</b> <br><span class="text-[10px] text-slate-500">${row[4]}</span></td>
-            <td class="p-3 whitespace-nowrap"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md text-[11px] border border-emerald-100">${row[5]}</span></td>
-            <td class="p-3 max-w-xs md:max-w-sm"><p class="line-clamp-2 text-xs">${row[6]}</p></td>
-            <td class="p-3 max-w-xs text-rose-600 text-xs"><p class="line-clamp-2">${row[7]}</p></td>
-          </tr>`).join('');
-      } else if (activeSubTab === 'misi') {
-        const data = dataObj.misi;
-        thead.innerHTML = `<tr><th class="p-3">Waktu Klaim</th><th class="p-3">Nama Siswa</th><th class="p-3">Kelas</th><th class="p-3">Misi Terselesaikan</th><th class="p-3">Poin</th></tr>`;
-        if (data.length === 0) tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Belum ada klaim misi.</td></tr>`;
-        else tbody.innerHTML = data.map(row => `
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-3 text-[11px] text-slate-500 whitespace-nowrap">${new Date(row[1]).toLocaleDateString('id-ID')}</td>
-            <td class="p-3 font-bold whitespace-nowrap">${row[3]}</td><td class="p-3 whitespace-nowrap">${row[4]}</td>
-            <td class="p-3 max-w-sm truncate text-slate-700 text-xs">${row[5]}</td>
-            <td class="p-3 whitespace-nowrap"><span class="font-bold text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded-md">+${row[6]} Poin</span></td>
-          </tr>`).join('');
+        thead.innerHTML = `<tr><th class="p-3">Info</th><th class="p-3">Kronologi</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>`;
+        tbody.innerHTML = currentAdminData.aduan.map(row => {
+          const lampiranHtml = (row[7] && row[7] !== '-') ? `<a href="${row[7]}" target="_blank" class="text-indigo-600 font-bold mt-1 block"><i class="fa-solid fa-paperclip"></i> Bukti</a>` : '';
+          return `<tr class="hover:bg-slate-50 border-b border-slate-100">
+            <td class="p-3 w-1/4"><div class="font-mono text-[9px] text-slate-400">${row[0]}</div><b>${row[3]}</b><br><span class="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded">${row[5]}</span></td>
+            <td class="p-3 w-1/2"><div class="text-xs text-slate-600 line-clamp-2">${row[6]}</div>${lampiranHtml}</td>
+            <td class="p-3 w-1/6"><span class="font-bold text-[10px] px-2 py-1 rounded ${row[8].includes('Selesai') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${row[8]}</span></td>
+            <td class="p-3 text-right"><button onclick="changeStatusPrompt('ADUAN', '${row[0]}')" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-lg font-semibold text-[11px]">Ubah</button></td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="4" class="p-4 text-center">Kosong</td></tr>`;
+      } 
+      else if (activeSubTab === 'bk') {
+        thead.innerHTML = `<tr><th class="p-3">Siswa</th><th class="p-3">Jadwal Diminta</th><th class="p-3">Topik</th><th class="p-3">Status & Aksi</th></tr>`;
+        tbody.innerHTML = currentAdminData.bk.map(row => `<tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-3"><b>${row[3]}</b><br><span class="text-[10px] text-slate-500">${row[4]}</span></td>
+          <td class="p-3">${row[5]}<br><b class="text-indigo-600 text-[10px]">${row[6]}</b></td>
+          <td class="p-3 text-xs max-w-[150px] truncate">${row[7]}</td>
+          <td class="p-3"><span class="font-bold text-[10px] px-2 py-1 rounded block mb-1 w-max ${row[8]=='Disetujui' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}">${row[8]}</span><button onclick="changeStatusPrompt('BK', '${row[0]}')" class="text-indigo-600 font-bold text-[10px] underline">Respon</button></td>
+        </tr>`).join('') || `<tr><td colspan="4" class="p-4 text-center">Kosong</td></tr>`;
+      } 
+      else if (activeSubTab === 'sarpras') {
+        thead.innerHTML = `<tr><th class="p-3">Info</th><th class="p-3">Kerusakan</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>`;
+        tbody.innerHTML = currentAdminData.sarpras.map(row => {
+          const lampiranHtml = (row[6] && row[6] !== '-') ? `<a href="${row[6]}" target="_blank" class="text-sky-600 font-bold mt-1 block"><i class="fa-solid fa-image"></i> Foto</a>` : '';
+          return `<tr class="hover:bg-slate-50 border-b border-slate-100">
+            <td class="p-3 w-1/4"><div class="font-mono text-[9px] text-slate-400">${row[0]}</div><b>${row[3]}</b></td>
+            <td class="p-3 w-1/2"><div class="text-[10px] font-bold text-sky-600">${row[4]}</div><div class="text-xs text-slate-600 line-clamp-2">${row[5]}</div>${lampiranHtml}</td>
+            <td class="p-3 w-1/6"><span class="font-bold text-[10px] px-2 py-1 rounded ${row[7]=='Selesai' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}">${row[7]}</span></td>
+            <td class="p-3 text-right"><button onclick="changeStatusPrompt('SARPRAS', '${row[0]}')" class="px-2.5 py-1 bg-sky-50 text-sky-600 rounded-lg font-semibold text-[11px]">Update</button></td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="4" class="p-4 text-center">Kosong</td></tr>`;
+      }
+      else if (activeSubTab === 'refleksi') {
+        thead.innerHTML = `<tr><th class="p-3">Siswa</th><th class="p-3">Emosi</th><th class="p-3">Catatan</th></tr>`;
+        tbody.innerHTML = currentAdminData.refleksi.map(row => `<tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-3"><b>${row[3]}</b><br><span class="text-[10px] text-slate-500">${row[4]}</span></td>
+          <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[10px]">${row[5]}</span></td>
+          <td class="p-3 text-xs"><div class="font-semibold text-slate-700">${row[6]}</div><div class="text-rose-600 text-[10px]">${row[7]}</div></td>
+        </tr>`).join('') || `<tr><td colspan="3" class="p-4 text-center">Kosong</td></tr>`;
+      }
+      else if (activeSubTab === 'misi') {
+        thead.innerHTML = `<tr><th class="p-3">Siswa</th><th class="p-3">Aktivitas</th><th class="p-3">Poin</th></tr>`;
+        tbody.innerHTML = currentAdminData.misi.map(row => `<tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-3"><b>${row[3]}</b><br><span class="text-[10px] text-slate-500">${row[4]}</span></td>
+          <td class="p-3 text-xs text-slate-700">${row[5]}</td>
+          <td class="p-3"><span class="font-bold text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded">+${row[6]} Poin</span></td>
+        </tr>`).join('') || `<tr><td colspan="3" class="p-4 text-center">Kosong</td></tr>`;
+      }
+      else if (activeSubTab === 'jurnal') {
+        thead.innerHTML = `<tr><th class="p-3">Waktu</th><th class="p-3">Petugas & Divisi</th><th class="p-3">Kegiatan</th><th class="p-3">Uraian & Dokumen</th></tr>`;
+        tbody.innerHTML = currentAdminData.jurnal.map(row => {
+          const dok = (row[6] && row[6] !== '-') ? `<a href="${row[6]}" target="_blank" class="text-emerald-600 font-bold mt-1 block"><i class="fa-solid fa-file-arrow-down"></i> Lihat Dokumentasi</a>` : '';
+          return `<tr class="hover:bg-slate-50 border-b border-slate-100">
+            <td class="p-3 text-[10px] text-slate-400 whitespace-nowrap">${row[1]}</td>
+            <td class="p-3"><b>${row[2]}</b><br><span class="text-[10px] text-indigo-600 font-semibold">${row[3]}</span></td>
+            <td class="p-3 font-bold text-xs text-slate-800">${row[4]}</td>
+            <td class="p-3 text-xs text-slate-600 max-w-xs">${row[5]}${dok}</td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="4" class="p-4 text-center">Belum ada catatan jurnal divisi.</td></tr>`;
       }
     }
 
-    async function promptStatus(sheetKey, rowId) {
-      const newStatus = prompt(`Masukkan status baru untuk ID [${rowId}]:\n(Contoh: Diproses / Selesai / Disetujui)`);
+    async function changeStatusPrompt(sheetKey, rowId) {
+      const newStatus = prompt(`Masukkan status baru untuk ID [${rowId}]:\n(Contoh: Diproses / Selesai / Ditangani)`);
       if (newStatus && newStatus.trim() !== '') {
         toggleLoading(true);
         const res = await callAPI('updateStatusRecord', { sheetKey: sheetKey, rowId: rowId, newStatus: newStatus.trim() });
         toggleLoading(false);
-        if (res.success) { showToast('Status berhasil diperbarui.', 'success'); loadAdminData(); loadPublicFeed(); }
+        if (res.success) { showToast('Status diperbarui', 'success'); loadAdminData(); } 
         else { showToast(res.message, 'error'); }
       }
     }
