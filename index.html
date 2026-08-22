@@ -13,22 +13,23 @@
     .custom-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04); }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    #loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+    #loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.75); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
     
-    /* Admin Layout Styles */
-    .admin-layout { display: flex; height: 100vh; overflow: hidden; }
-    .admin-sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; transition: all 0.3s; }
-    .admin-content { flex: 1; overflow-y: auto; background: #f1f5f9; }
+    /* Layout Admin */
+    .admin-layout { display: flex; height: 100vh; overflow: hidden; background: #f8fafc; }
+    .admin-sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; transition: all 0.3s; z-index: 40; }
+    .admin-content { flex-grow: 1; overflow-y: auto; position: relative; }
+    
     @media (max-width: 768px) {
-      .admin-sidebar { position: fixed; z-index: 50; height: 100%; transform: translateX(-100%); }
-      .admin-sidebar.open { transform: translateX(0); }
+      .admin-sidebar { position: fixed; left: -260px; height: 100%; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+      .admin-sidebar.open { left: 0; }
     }
   </style>
 </head>
-<body class="text-slate-800 antialiased h-screen flex flex-col">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-  <!-- ================= PUBLIC HEADER ================= -->
-  <header id="public-header" class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm shrink-0">
+  <!-- TOP HEADER (PUBLIC) -->
+  <header id="public-header" class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="goToView('beranda')">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white text-lg shadow-sm">
@@ -65,20 +66,48 @@
   <!-- ================= PUBLIC MAIN CONTAINER ================= -->
   <main id="public-main" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 mb-20 md:mb-6 overflow-y-auto block">
     
-    <!-- VIEW: BERANDA (TETAP SAMA) -->
+    <!-- VIEW: BERANDA (HUB) -->
     <section id="view-beranda" class="space-y-6 block">
+      
+      <!-- Hero Banner -->
       <div class="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-8 relative overflow-hidden custom-shadow">
-        <div class="absolute right-0 top-0 opacity-10 pointer-events-none translate-x-1/4 -translate-y-1/4"><i class="fa-solid fa-shield-cat text-[200px]"></i></div>
+        <div class="absolute right-0 top-0 opacity-10 pointer-events-none translate-x-1/4 -translate-y-1/4">
+           <i class="fa-solid fa-shield-cat text-[200px]"></i>
+        </div>
         <div class="relative z-10 max-w-2xl">
           <span class="inline-block px-3 py-1 bg-indigo-500/30 text-indigo-200 rounded-full text-[10px] font-semibold uppercase tracking-wider mb-3 border border-indigo-500/50">SMKN 2 Mantangai Ramah Anak</span>
           <h2 class="text-2xl sm:text-3xl font-bold mb-2">Budaya Sekolah Aman, Nyaman & Menyenangkan</h2>
-          <p class="text-slate-300 text-sm leading-relaxed mb-6">Layanan publik untuk pengaduan, konseling, dan aspirasi warga sekolah.</p>
+          <p class="text-slate-300 text-sm leading-relaxed mb-6">Layanan publik untuk pengaduan, konseling, dan apresiasi warga sekolah.</p>
         </div>
       </div>
+
+      <!-- BANNER TRANSPARANSI PUBLIK (INDEKS BSAN) -->
+      <div class="bg-gradient-to-br from-white to-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-200 custom-shadow flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+        <div class="text-center md:text-left flex-shrink-0 z-10">
+          <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">📊 Transparansi Indeks Sekolah</h3>
+          <div class="flex items-end justify-center md:justify-start gap-2">
+            <span id="public-score-bsan" class="text-5xl sm:text-6xl font-bold text-slate-800 transition-colors duration-500">0</span>
+            <span class="text-base text-slate-400 font-medium mb-1">/ 100</span>
+          </div>
+          <p id="public-score-status" class="text-xs font-semibold mt-2 text-slate-600">Menghitung data...</p>
+        </div>
+        
+        <div class="w-full md:w-auto flex-grow z-10">
+          <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-xs w-full">
+             <p class="font-bold mb-2 text-slate-700 border-b border-slate-100 pb-1.5 flex justify-between items-center">
+               <span>Rincian Kalkulasi (Real-Time):</span>
+               <i class="fa-solid fa-circle-info text-indigo-400"></i>
+             </p>
+             <ul id="public-score-breakdown" class="space-y-1.5 text-slate-600 font-medium">
+                <li class="animate-pulse">Mengambil data dari server...</li>
+             </ul>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 class="font-bold text-slate-800 text-base mb-3 px-1">Layanan Utama</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <!-- Shortcut Icons -->
           <div onclick="goToView('aduan')" class="cursor-pointer bg-white p-4 rounded-2xl border border-slate-200 hover:border-rose-400 hover:shadow-lg transition-all group flex flex-col items-center text-center">
             <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110"><i class="fa-solid fa-bullhorn"></i></div>
             <h4 class="font-bold text-slate-700 text-xs">Lapor Aduan</h4>
@@ -112,7 +141,6 @@
         </div>
       </div>
       
-      <!-- Feed Public -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
         <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 custom-shadow">
           <h3 class="font-bold text-slate-800 text-base mb-4">💌 Kudos Wall</h3>
@@ -212,7 +240,24 @@
             <option value="Lainnya">Lainnya</option>
           </select>
           <textarea id="sar-deskripsi" required rows="3" class="w-full text-sm p-3 border rounded-xl" placeholder="Deskripsi Kerusakan..."></textarea>
-          <input type="url" id="sar-bukti" class="w-full text-sm p-3 border rounded-xl" placeholder="Link Foto Bukti (Opsional)">
+          
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-2">Bukti Foto (Opsional)</label>
+            <div class="flex gap-2 mb-3 bg-sky-50 p-1 rounded-lg w-max border border-sky-100">
+              <button type="button" id="tab-url-sarpras" onclick="switchBuktiType('sarpras', 'url')" class="px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition">Pakai Tautan</button>
+              <button type="button" id="tab-file-sarpras" onclick="switchBuktiType('sarpras', 'file')" class="px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition">Unggah File</button>
+            </div>
+            
+            <div id="input-url-sarpras">
+              <input type="url" id="sarpras-bukti-url" class="w-full text-sm p-3 border rounded-xl bg-white" placeholder="Link Foto Bukti (Opsional)">
+            </div>
+            
+            <div id="input-file-sarpras" class="hidden">
+              <input type="file" id="sarpras-bukti-file" accept="image/*" class="w-full text-sm p-2 border rounded-xl bg-slate-50 text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200 transition">
+              <p class="text-[10px] text-slate-500 mt-1">Maksimal file gambar 10MB.</p>
+            </div>
+          </div>
+          
           <button type="submit" class="w-full py-3 bg-sky-600 text-white font-bold rounded-xl">Kirim Laporan</button>
         </form>
       </div>
@@ -349,8 +394,37 @@
       </header>
 
       <div class="p-4 sm:p-6 flex-grow">
+        
         <!-- TAB: DASHBOARD -->
         <div id="tab-dashboard" class="space-y-6">
+          
+          <!-- BANNER INDEKS BSAN -->
+          <div class="bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-900 text-white p-5 sm:p-6 rounded-2xl custom-shadow relative overflow-hidden">
+            <div class="absolute right-0 top-0 opacity-5 pointer-events-none translate-x-1/4 -translate-y-1/4">
+              <i class="fa-solid fa-chart-line text-[150px]"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+               <div class="text-center md:text-left">
+                  <h3 class="text-[11px] sm:text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">📊 Indeks Budaya Aman & Nyaman</h3>
+                  <div class="flex items-end justify-center md:justify-start gap-3">
+                     <span id="score-bsan" class="text-6xl sm:text-7xl font-bold text-white drop-shadow-md">0</span>
+                     <span class="text-lg text-indigo-400 font-medium mb-2">/ 100</span>
+                  </div>
+                  <p id="score-status" class="text-xs text-indigo-200 mt-2 font-semibold">Memuat status sekolah...</p>
+               </div>
+               
+               <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-xl text-xs w-full md:w-1/2 shadow-inner">
+                  <p class="font-bold mb-2 border-b border-white/20 pb-1.5 flex justify-between items-center">
+                    <span>Parameter Penilaian Real-time:</span>
+                    <i class="fa-solid fa-circle-info text-indigo-300"></i>
+                  </p>
+                  <ul id="score-breakdown" class="space-y-1.5 text-indigo-100 font-medium">
+                     <li class="animate-pulse">Menghitung matriks...</li>
+                  </ul>
+               </div>
+            </div>
+          </div>
+
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
               <p class="text-[10px] text-slate-500 font-bold uppercase">Tugas (Aktif)</p>
@@ -382,7 +456,7 @@
         <div id="tab-proker" class="hidden space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-slate-800">Daftar Program Kerja Divisi</h3>
-            <button onclick="showToast('Fitur Tambah Proker segera aktif.', 'info')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg shadow hover:bg-indigo-700"><i class="fa-solid fa-plus mr-1"></i> Buat Program</button>
+            <button onclick="openModal('modal-add-proker')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg shadow hover:bg-indigo-700"><i class="fa-solid fa-plus mr-1"></i> Buat Program</button>
           </div>
           <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
             <table class="w-full text-left text-xs whitespace-nowrap">
@@ -396,6 +470,7 @@
         <div id="tab-tugas" class="hidden space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-slate-800">Tugas (To-Do List)</h3>
+            <button onclick="openModal('modal-add-tugas')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg shadow hover:bg-indigo-700"><i class="fa-solid fa-plus mr-1"></i> Tambah Tugas</button>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="kanban-tugas"></div>
         </div>
@@ -404,7 +479,7 @@
         <div id="tab-temuan" class="hidden space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-slate-800">Temuan & Tindak Lanjut</h3>
-            <button onclick="showToast('Fitur Tambah Temuan sedang dibangun', 'info')" class="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg shadow hover:bg-rose-700">Catat Temuan Baru</button>
+            <button onclick="openModal('modal-add-temuan')" class="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg shadow hover:bg-rose-700">Catat Temuan Baru</button>
           </div>
           <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
             <table class="w-full text-left text-xs">
@@ -473,12 +548,72 @@
     </div>
   </div>
 
+  <!-- Modal Tambah Proker -->
+  <div id="modal-add-proker" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <h3 class="font-bold text-slate-800 text-base mb-4">Buat Program Kerja</h3>
+      <form onsubmit="handleFormProker(event)" class="space-y-4">
+        <input type="text" id="add-proker-nama" required class="w-full text-sm p-3 border rounded-xl" placeholder="Nama Program (Contoh: Patroli Jumat)">
+        <input type="text" id="add-proker-periode" required class="w-full text-sm p-3 border rounded-xl" placeholder="Periode (Contoh: Sem. Ganjil 2024)">
+        <input type="text" id="add-proker-target" required class="w-full text-sm p-3 border rounded-xl" placeholder="Target Capaian">
+        <div class="flex gap-2 mt-4">
+          <button type="button" onclick="closeModal('modal-add-proker')" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl">Batal</button>
+          <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl">Simpan Proker</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Tugas -->
+  <div id="modal-add-tugas" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <h3 class="font-bold text-slate-800 text-base mb-4">Delegasi Tugas</h3>
+      <form onsubmit="handleFormTugas(event)" class="space-y-4">
+        <input type="text" id="add-tugas-nama" required class="w-full text-sm p-3 border rounded-xl" placeholder="Deskripsi Tugas">
+        <input type="text" id="add-tugas-penerima" required class="w-full text-sm p-3 border rounded-xl" placeholder="Penerima (Nama Anggota / Divisi)">
+        <input type="date" id="add-tugas-deadline" required class="w-full text-sm p-3 border rounded-xl">
+        <div class="flex gap-2 mt-4">
+          <button type="button" onclick="closeModal('modal-add-tugas')" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl">Batal</button>
+          <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl">Buat Tugas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Temuan -->
+  <div id="modal-add-temuan" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <h3 class="font-bold text-slate-800 text-base mb-4">Catat Temuan Lapangan</h3>
+      <form onsubmit="handleFormTemuan(event)" class="space-y-4">
+        <select id="add-temuan-kategori" required class="w-full text-sm p-3 border rounded-xl bg-white">
+          <option value="" disabled selected>Pilih Kategori...</option>
+          <option value="Infrastruktur">Infrastruktur & Fasilitas</option>
+          <option value="Keamanan">Risiko Keamanan</option>
+          <option value="Kenyamanan">Kebersihan & Kenyamanan</option>
+        </select>
+        <input type="text" id="add-temuan-lokasi" required class="w-full text-sm p-3 border rounded-xl" placeholder="Lokasi (Contoh: Kantin)">
+        <textarea id="add-temuan-deskripsi" required rows="2" class="w-full text-sm p-3 border rounded-xl" placeholder="Deskripsikan masalah..."></textarea>
+        <div class="grid grid-cols-2 gap-2">
+          <select id="add-temuan-prioritas" required class="w-full text-sm p-3 border rounded-xl bg-white">
+            <option value="Sedang">Prioritas Sedang</option>
+            <option value="Tinggi">Prioritas Tinggi</option>
+          </select>
+          <input type="text" id="add-temuan-tldivisi" required class="w-full text-sm p-3 border rounded-xl" placeholder="Tindak Lanjut ke Divisi apa?">
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button type="button" onclick="closeModal('modal-add-temuan')" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl">Batal</button>
+          <button type="submit" class="flex-1 py-3 bg-rose-600 text-white font-bold rounded-xl">Lapor Temuan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col space-y-2 pointer-events-none"></div>
-  <div id="loading-overlay"><div class="bg-white p-4 rounded-xl shadow-xl flex items-center gap-3"><i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl"></i><span class="text-sm font-semibold text-slate-700">Sinkronisasi...</span></div></div>
+  <div id="loading-overlay"><div class="bg-white p-4 rounded-xl shadow-xl flex items-center gap-3"><i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl"></i><span class="text-sm font-semibold text-slate-700">Memproses...</span></div></div>
 
   <!-- ================= SCRIPTS ================= -->
   <script>
-    // GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA
+    // URL Web App Google Apps Script
     const API_URL = "https://script.google.com/macros/s/AKfycbwWJB2dZie2ZvmAbuJLJogRD4mtYDMNVGA7CNfSTb_sjzDUV8Z83aSMz-bZ12ewiQ3g/exec"; 
     
     let loggedUser = null;
@@ -488,7 +623,11 @@
 
     async function callAPI(action, dataObj = {}) {
       try {
-        const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: action, data: dataObj }) });
+        const response = await fetch(API_URL, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, data: dataObj }) 
+        });
         if (!response.ok) throw new Error("Gagal terhubung.");
         return await response.json();
       } catch (e) {
@@ -545,7 +684,7 @@
 
     function getBuktiData(formType) {
       return new Promise(async (resolve) => {
-        const urlInput = document.getElementById(`${formType}-bukti-url`).value;
+        const urlInput = document.getElementById(`${formType}-bukti-url`) ? document.getElementById(`${formType}-bukti-url`).value : "";
         const fileInput = document.getElementById(`${formType}-bukti-file`) ? document.getElementById(`${formType}-bukti-file`).files[0] : null;
         
         if (fileInput) {
@@ -574,8 +713,65 @@
     async function loadPublicFeed() {
       const res = await callAPI('getPublicFeed');
       if (res.success) {
-        document.getElementById('kudos-stream').innerHTML = res.kudos.map(k => `<div class="p-3 bg-amber-50 border border-amber-100 rounded-xl"><p class="text-xs text-slate-700 italic mb-1">"${k.pesan}"</p><p class="text-[9px] font-bold text-amber-700">Dari: ${k.dari} | Untuk: ${k.untuk}</p></div>`).join('') || '<p class="text-xs text-slate-400">Belum ada kudos.</p>';
-        document.getElementById('sarpras-quick-list').innerHTML = res.sarpras.map(s => `<div class="flex justify-between p-2 bg-slate-50 rounded-lg border text-xs"><span class="font-semibold">${s.lokasi}</span><span class="text-[9px] px-2 py-0.5 bg-sky-100 text-sky-700 rounded">${s.status}</span></div>`).join('') || '<p class="text-xs text-slate-400">Aman.</p>';
+        // Render Kudos
+        const kContainer = document.getElementById('kudos-stream');
+        if (res.kudos.length === 0) kContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs col-span-2">Belum ada pesan.</div>`;
+        else kContainer.innerHTML = res.kudos.map(k => `
+          <div class="p-3.5 bg-amber-50/50 border border-amber-100 rounded-xl">
+            <div class="flex justify-between items-start mb-1"><span class="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">${k.kategori}</span></div>
+            <p class="text-xs text-slate-700 italic mb-2 font-medium line-clamp-3">"${k.pesan}"</p>
+            <div class="text-[10px] font-semibold text-slate-600 flex justify-between"><span>Untuk: <b>${k.untuk}</b></span><span class="font-normal text-slate-400">Oleh: ${k.dari}</span></div>
+          </div>
+        `).join('');
+
+        // Render Sarpras
+        const sContainer = document.getElementById('sarpras-quick-list');
+        if (res.sarpras.length === 0) sContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Fasilitas terpantau baik.</div>`;
+        else sContainer.innerHTML = res.sarpras.map(s => `
+          <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50">
+            <div class="truncate pr-2"><p class="text-[11px] font-bold text-slate-800 truncate">${s.lokasi}</p><p class="text-[9px] text-slate-500 truncate">${s.jenis}</p></div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded shrink-0 ${(s.status === 'Selesai' || s.status === 'Diperbaiki') ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}">${s.status}</span>
+          </div>
+        `).join('');
+        
+        // Render Statistik Indeks Publik
+        if (res.statistik) {
+          const stat = res.statistik;
+          const baseScore = 80;
+          const pointMinus = stat.kasusAktif * -5;
+          const pointPlusKasus = stat.kasusSelesai * 3;
+          const pointPlusProker = stat.prokerSelesai * 2;
+          
+          let totalScore = baseScore + pointMinus + pointPlusKasus + pointPlusProker;
+          if (totalScore > 100) totalScore = 100;
+          if (totalScore < 0) totalScore = 0;
+
+          // Animasi Angka Skor Publik
+          let currScore = 0;
+          const scoreEl = document.getElementById('public-score-bsan');
+          const interval = setInterval(() => {
+            currScore += 2;
+            if(currScore >= totalScore) { currScore = totalScore; clearInterval(interval); }
+            scoreEl.innerText = currScore;
+            
+            if (currScore < 60) scoreEl.className = "text-5xl sm:text-6xl font-bold text-rose-500 transition-colors duration-500";
+            else if (currScore < 80) scoreEl.className = "text-5xl sm:text-6xl font-bold text-amber-500 transition-colors duration-500";
+            else scoreEl.className = "text-5xl sm:text-6xl font-bold text-emerald-500 transition-colors duration-500";
+          }, 20);
+
+          const statusEl = document.getElementById('public-score-status');
+          if (totalScore >= 90) statusEl.innerHTML = '<i class="fa-solid fa-star text-amber-500 mr-1"></i> Sangat Kondusif! Teruskan!';
+          else if (totalScore >= 75) statusEl.innerHTML = '<i class="fa-solid fa-face-smile text-emerald-500 mr-1"></i> Sekolah Aman & Nyaman.';
+          else if (totalScore >= 50) statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i> Ada masalah, sedang diperbaiki.';
+          else statusEl.innerHTML = '<i class="fa-solid fa-skull-crossbones text-rose-500 mr-1"></i> Waspada! Budaya sekolah perlu atensi!';
+
+          document.getElementById('public-score-breakdown').innerHTML = `
+            <li class="flex justify-between items-center"><span class="text-slate-500"><i class="fa-solid fa-flag-checkered w-4"></i> Skor Standar</span> <span class="font-bold text-slate-700">80</span></li>
+            <li class="flex justify-between items-center text-rose-600"><span><i class="fa-solid fa-circle-exclamation w-4"></i> Kasus & Aduan Aktif (${stat.kasusAktif})</span> <span class="font-bold">${pointMinus}</span></li>
+            <li class="flex justify-between items-center text-emerald-600"><span><i class="fa-solid fa-check-double w-4"></i> Kasus Berhasil Diselesaikan (${stat.kasusSelesai})</span> <span class="font-bold">+${pointPlusKasus}</span></li>
+            <li class="flex justify-between items-center text-sky-600"><span><i class="fa-solid fa-diagram-project w-4"></i> Program Tim Selesai (${stat.prokerSelesai})</span> <span class="font-bold">+${pointPlusProker}</span></li>
+          `;
+        }
       }
     }
 
@@ -619,10 +815,14 @@
     }
 
     async function handleFormSarpras(e) {
-      e.preventDefault(); toggleLoading(true);
+      e.preventDefault(); 
+      const buktiRaw = await getBuktiData('sarpras');
+      if (buktiRaw === null) return;
+
+      toggleLoading(true);
       const res = await callAPI('submitSarpras', {
         lokasi: document.getElementById('sar-lokasi').value, jenis: document.getElementById('sar-jenis').value,
-        deskripsi: document.getElementById('sar-deskripsi').value
+        deskripsi: document.getElementById('sar-deskripsi').value, bukti: buktiRaw
       });
       toggleLoading(false);
       if(res.success){ document.getElementById('form-sarpras').reset(); document.getElementById('resi-id').innerText=res.id; openModal('modal-resi'); } else { showToast(res.message,'error'); }
@@ -666,7 +866,11 @@
       toggleLoading(false);
       const c = document.getElementById('hasil-lacak'); c.classList.remove('hidden');
       if(res.success && res.found) {
-        c.innerHTML = `<div class="p-4 border rounded-xl bg-slate-50"><span class="px-2 py-1 text-[10px] font-bold rounded bg-indigo-100 text-indigo-700">${res.data.status}</span><p class="mt-2 text-sm font-bold text-slate-800">ID: ${res.data.id}</p><p class="text-xs text-slate-600 mt-1">"${res.data.kronologi}"</p></div>`;
+        let bukti = '';
+        if(res.data.bukti && res.data.bukti !== '-') {
+           bukti = `<a href="${res.data.bukti}" target="_blank" class="block mt-2 text-[10px] text-indigo-600 font-bold hover:underline"><i class="fa-solid fa-paperclip"></i> Lihat Lampiran</a>`;
+        }
+        c.innerHTML = `<div class="p-4 border rounded-xl bg-slate-50"><span class="px-2 py-1 text-[10px] font-bold rounded bg-indigo-100 text-indigo-700">${res.data.status}</span><p class="mt-2 text-sm font-bold text-slate-800">ID: ${res.data.id}</p><p class="text-xs text-slate-600 mt-1">"${res.data.kronologi}"</p>${bukti}</div>`;
       } else { c.innerHTML = `<div class="p-3 text-xs text-rose-600 bg-rose-50 rounded-lg">Data tidak ditemukan.</div>`; }
     }
 
@@ -734,19 +938,57 @@
       toggleLoading(true);
       
       if(tabName === 'dashboard' || tabName === 'tugas' || tabName === 'proker') {
-        const res = await callAPI('getWorkspaceData', { divisi: loggedUser.divisi, username: loggedUser.username });
+        const res = await callAPI('getWorkspaceData', { divisi: loggedUser.divisi, username: loggedUser.username, role: loggedUser.role });
         if(res.success) { appData = res.data; renderDashboard(); renderProker(); renderTugas(); }
       } else if (tabName === 'temuan') {
-        const res = await callAPI('getTemuanTL', { divisi: loggedUser.divisi });
+        const res = await callAPI('getTemuanTL', { divisi: loggedUser.divisi, role: loggedUser.role });
         if(res.success) { appData.temuan = res.data.temuan; renderTemuan(); }
       } else if (tabName === 'aduan') {
-        const res = await callAPI('getAduanMasuk', { divisi: loggedUser.divisi });
+        const res = await callAPI('getAduanMasuk', { divisi: loggedUser.divisi, role: loggedUser.role });
         if(res.success) { appData.aduan = res.data; renderAduan(); }
+        else { showToast(res.message, 'info'); }
       }
       toggleLoading(false);
     }
 
     function renderDashboard() {
+      const stat = appData.statistik;
+      const baseScore = 80;
+      
+      const pointMinus = stat.kasusAktif * -5;
+      const pointPlusKasus = stat.kasusSelesai * 3;
+      const pointPlusProker = stat.prokerSelesai * 2;
+      
+      let totalScore = baseScore + pointMinus + pointPlusKasus + pointPlusProker;
+      if (totalScore > 100) totalScore = 100;
+      if (totalScore < 0) totalScore = 0;
+
+      // Animasi Angka Skor Admin
+      let currScore = 0;
+      const scoreEl = document.getElementById('score-bsan');
+      const interval = setInterval(() => {
+        currScore += 2;
+        if(currScore >= totalScore) { currScore = totalScore; clearInterval(interval); }
+        scoreEl.innerText = currScore;
+        
+        if (currScore < 60) scoreEl.className = "text-6xl sm:text-7xl font-bold text-rose-400 drop-shadow-md";
+        else if (currScore < 80) scoreEl.className = "text-6xl sm:text-7xl font-bold text-amber-400 drop-shadow-md";
+        else scoreEl.className = "text-6xl sm:text-7xl font-bold text-emerald-400 drop-shadow-md";
+      }, 20);
+
+      const statusEl = document.getElementById('score-status');
+      if (totalScore >= 90) statusEl.innerHTML = '<i class="fa-solid fa-star text-amber-400 mr-1"></i> Sangat Kondusif! Pertahankan!';
+      else if (totalScore >= 75) statusEl.innerHTML = '<i class="fa-solid fa-face-smile text-emerald-400 mr-1"></i> Sekolah Aman & Nyaman.';
+      else if (totalScore >= 50) statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i> Ada masalah yang perlu segera ditangani.';
+      else statusEl.innerHTML = '<i class="fa-solid fa-skull-crossbones text-rose-400 mr-1"></i> Waspada! Budaya sekolah memburuk!';
+
+      document.getElementById('score-breakdown').innerHTML = `
+        <li class="flex justify-between items-center"><span><i class="fa-solid fa-flag-checkered text-slate-300 w-4"></i> Skor Dasar (Awal)</span> <span class="font-bold text-white">80</span></li>
+        <li class="flex justify-between items-center text-rose-200"><span><i class="fa-solid fa-circle-exclamation w-4"></i> Aduan/Temuan Menggantung (${stat.kasusAktif})</span> <span class="font-bold">${pointMinus}</span></li>
+        <li class="flex justify-between items-center text-emerald-200"><span><i class="fa-solid fa-check-double w-4"></i> Kasus Berhasil Diselesaikan (${stat.kasusSelesai})</span> <span class="font-bold">+${pointPlusKasus}</span></li>
+        <li class="flex justify-between items-center text-sky-200"><span><i class="fa-solid fa-diagram-project w-4"></i> Program Kerja Rampung (${stat.prokerSelesai})</span> <span class="font-bold">+${pointPlusProker}</span></li>
+      `;
+
       document.getElementById('stat-tugas').innerText = appData.tugas.filter(t => t.status !== 'Selesai').length;
       document.getElementById('stat-proker').innerText = appData.proker.length;
       document.getElementById('stat-jurnal').innerText = appData.statJurnal || 0;
@@ -776,7 +1018,7 @@
       const renderCard = (t) => `<div class="bg-white p-3 rounded-xl border mb-3">
         <p class="text-xs font-bold text-slate-800 mb-2">${t.nama}</p>
         <div class="flex justify-between items-center"><span class="text-[10px] text-slate-500">Batas: ${t.deadline}</span>
-        <button onclick="showToast('Update status via sistem belum aktif', 'info')" class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold">Update</button></div>
+        <button onclick="promptUpdateTugas('${t.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold transition">Update Status</button></div>
       </div>`;
 
       c.innerHTML = `
@@ -839,6 +1081,50 @@
       toggleLoading(false);
       if(res.success){ showToast(res.message); document.getElementById('form-jurnal').reset(); closeModal('modal-jurnal'); fetchAdminData('dashboard'); }
       else { showToast(res.message, 'error'); }
+    }
+
+    async function handleFormProker(e) {
+      e.preventDefault(); toggleLoading(true);
+      const res = await callAPI('createProker', {
+        nama: document.getElementById('add-proker-nama').value, periode: document.getElementById('add-proker-periode').value,
+        target: document.getElementById('add-proker-target').value, pj: loggedUser.nama, divisi: loggedUser.divisi
+      });
+      toggleLoading(false);
+      if(res.success) { showToast(res.message); document.getElementById('modal-add-proker').querySelector('form').reset(); closeModal('modal-add-proker'); fetchAdminData('proker'); }
+      else { showToast(res.message, 'error'); }
+    }
+
+    async function handleFormTugas(e) {
+      e.preventDefault(); toggleLoading(true);
+      const res = await callAPI('createTugas', {
+        nama: document.getElementById('add-tugas-nama').value, penerima: document.getElementById('add-tugas-penerima').value,
+        deadline: document.getElementById('add-tugas-deadline').value, divisi: loggedUser.divisi, role: loggedUser.role
+      });
+      toggleLoading(false);
+      if(res.success) { showToast(res.message); document.getElementById('modal-add-tugas').querySelector('form').reset(); closeModal('modal-add-tugas'); fetchAdminData('tugas'); }
+      else { showToast(res.message, 'error'); }
+    }
+
+    async function handleFormTemuan(e) {
+      e.preventDefault(); toggleLoading(true);
+      const res = await callAPI('createTemuan', {
+        kategori: document.getElementById('add-temuan-kategori').value, lokasi: document.getElementById('add-temuan-lokasi').value,
+        deskripsi: document.getElementById('add-temuan-deskripsi').value, prioritas: document.getElementById('add-temuan-prioritas').value,
+        tldivisi: document.getElementById('add-temuan-tldivisi').value, divisi: loggedUser.divisi, role: loggedUser.role
+      });
+      toggleLoading(false);
+      if(res.success) { showToast(res.message); document.getElementById('modal-add-temuan').querySelector('form').reset(); closeModal('modal-add-temuan'); fetchAdminData('temuan'); }
+      else { showToast(res.message, 'error'); }
+    }
+
+    async function promptUpdateTugas(id) {
+      const newStatus = prompt('Update Status Tugas:\nKetik: "Dalam Proses" atau "Selesai"');
+      if(newStatus && (newStatus.trim() === 'Dalam Proses' || newStatus.trim() === 'Selesai')) {
+        toggleLoading(true);
+        const res = await callAPI('updateTugas', { id: id, status: newStatus.trim() });
+        toggleLoading(false);
+        if(res.success) { showToast(res.message); fetchAdminData('tugas'); }
+      } else if (newStatus) { showToast('Ketikan salah. Tulis: Dalam Proses / Selesai', 'info'); }
     }
   </script>
 </body>
