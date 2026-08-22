@@ -148,8 +148,25 @@
             <option value="Lainnya">Lainnya</option>
           </select>
           <textarea id="aduan-kronologi" required rows="4" class="w-full text-sm p-3 border rounded-xl" placeholder="Ceritakan detail kejadian..."></textarea>
-          <input type="url" id="aduan-bukti-url" class="w-full text-sm p-3 border rounded-xl" placeholder="Link Bukti Foto/Video (Gdrive/Lainnya) - Opsional">
-          <button type="submit" class="w-full py-3 bg-rose-600 text-white font-bold rounded-xl">Kirim Laporan</button>
+          
+          <div class="mt-2">
+            <label class="block text-xs font-semibold text-slate-600 mb-2">Lampiran Bukti (Opsional)</label>
+            <div class="flex gap-2 mb-3 bg-rose-50 p-1 rounded-lg w-max border border-rose-100">
+              <button type="button" id="tab-url-aduan" onclick="switchBuktiType('aduan', 'url')" class="px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition">Pakai Tautan</button>
+              <button type="button" id="tab-file-aduan" onclick="switchBuktiType('aduan', 'file')" class="px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition">Unggah File</button>
+            </div>
+            
+            <div id="input-url-aduan">
+              <input type="url" id="aduan-bukti-url" class="w-full text-sm p-3 border rounded-xl bg-white" placeholder="Link Bukti Foto/Video (Gdrive/Lainnya) - Opsional">
+            </div>
+            
+            <div id="input-file-aduan" class="hidden">
+              <input type="file" id="aduan-bukti-file" accept="image/*,.pdf,.mp4" class="w-full text-sm p-2 border rounded-xl bg-slate-50 text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200 transition">
+              <p class="text-[10px] text-slate-500 mt-1">Maksimal file 10MB (Gambar/PDF/Video).</p>
+            </div>
+          </div>
+          
+          <button type="submit" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-lg mt-2 transition">Kirim Laporan</button>
         </form>
       </div>
     </section>
@@ -311,7 +328,7 @@
         <!-- Khusus Role Tertentu (Disembunyikan via JS) -->
         <div id="nav-group-layanan" class="hidden">
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4">Layanan Kasus</p>
-          <button onclick="showToast('Akses Modul Aduan sedang dibangun.', 'info')" class="w-full text-left p-2.5 rounded-lg hover:bg-slate-100 transition"><i class="fa-solid fa-bullhorn w-6 text-rose-500"></i> Kelola Aduan</button>
+          <button onclick="switchAdminTab('aduan')" id="nav-aduan" class="w-full text-left p-2.5 rounded-lg hover:bg-slate-100 transition"><i class="fa-solid fa-bullhorn w-6 text-rose-500"></i> Kelola Aduan</button>
         </div>
       </div>
       <div class="p-4 border-t border-slate-200">
@@ -393,6 +410,19 @@
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 border-b border-slate-200 text-slate-600"><tr><th class="p-3">Temuan</th><th class="p-3">Lokasi/Prioritas</th><th class="p-3">Tindak Lanjut (Ke Divisi)</th><th class="p-3">Status</th></tr></thead>
               <tbody id="tbl-temuan" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB: ADUAN -->
+        <div id="tab-aduan" class="hidden space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-slate-800">Laporan Aduan Siswa</h3>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600"><tr><th class="p-3">Info Pelapor</th><th class="p-3">Kronologi Kejadian</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr></thead>
+              <tbody id="tbl-aduan" class="divide-y divide-slate-100 text-slate-700"></tbody>
             </table>
           </div>
         </div>
@@ -483,6 +513,52 @@
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     function openLoginModal() { openModal('modal-login'); }
 
+    // --- File Upload & Tab Logic ---
+    function switchBuktiType(formType, type) {
+      const isUrl = type === 'url';
+      document.getElementById(`input-url-${formType}`).style.display = isUrl ? 'block' : 'none';
+      document.getElementById(`input-file-${formType}`).style.display = isUrl ? 'none' : 'block';
+      
+      const tabUrl = document.getElementById(`tab-url-${formType}`);
+      const tabFile = document.getElementById(`tab-file-${formType}`);
+      
+      if(isUrl){
+        tabUrl.className = "px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition";
+        tabFile.className = "px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition";
+        if(document.getElementById(`${formType}-bukti-file`)) document.getElementById(`${formType}-bukti-file`).value = "";
+      } else {
+        tabFile.className = "px-3 py-1 text-xs font-semibold rounded bg-white shadow text-slate-800 transition";
+        tabUrl.className = "px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:text-slate-800 transition";
+        if(document.getElementById(`${formType}-bukti-url`)) document.getElementById(`${formType}-bukti-url`).value = "";
+      }
+    }
+
+    async function getBase64(file) {
+      if(!file) return null;
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function getBuktiData(formType) {
+      return new Promise(async (resolve) => {
+        const urlInput = document.getElementById(`${formType}-bukti-url`).value;
+        const fileInput = document.getElementById(`${formType}-bukti-file`) ? document.getElementById(`${formType}-bukti-file`).files[0] : null;
+        
+        if (fileInput) {
+          // Batas File 10MB (10 * 1024 * 1024 bytes)
+          if (fileInput.size > 10485760) { showToast("Maksimal ukuran file adalah 10MB!", "error"); resolve(null); return; }
+          const b64 = await getBase64(fileInput);
+          resolve(b64);
+        } else {
+          resolve(urlInput || '-');
+        }
+      });
+    }
+
     // --- Public Logic ---
     function goToView(viewId) {
       if(loggedUser && viewId !== 'admin') logoutAdmin(); 
@@ -510,14 +586,25 @@
     }
 
     async function handleFormAduan(e) {
-      e.preventDefault(); toggleLoading(true);
+      e.preventDefault(); 
+      const buktiRaw = await getBuktiData('aduan');
+      if (buktiRaw === null) return; // Batal jika validasi file gagal
+
+      toggleLoading(true);
       const res = await callAPI('submitAduan', {
         isAnonim: document.getElementById('aduan-anonim').checked, nisn: document.getElementById('aduan-nisn').value,
         nama: document.getElementById('aduan-nama').value, kelas: document.getElementById('aduan-kelas').value,
-        kategori: document.getElementById('aduan-kategori').value, kronologi: document.getElementById('aduan-kronologi').value
+        kategori: document.getElementById('aduan-kategori').value, kronologi: document.getElementById('aduan-kronologi').value,
+        bukti: buktiRaw
       });
       toggleLoading(false);
-      if(res.success){ document.getElementById('form-aduan').reset(); document.getElementById('resi-id').innerText=res.id; openModal('modal-resi'); } else { showToast(res.message,'error'); }
+      if(res.success){ 
+        document.getElementById('form-aduan').reset(); 
+        document.getElementById('aduan-anonim').checked = false;
+        toggleAnonim(document.getElementById('aduan-anonim'), 'identitas-aduan', []);
+        document.getElementById('resi-id').innerText=res.id; 
+        openModal('modal-resi'); 
+      } else { showToast(res.message,'error'); }
     }
 
     async function handleFormBK(e) {
@@ -624,7 +711,7 @@
     function toggleSidebar() { document.getElementById('admin-sidebar').classList.toggle('open'); }
 
     function switchAdminTab(tabName) {
-      const tabs = ['dashboard', 'proker', 'tugas', 'temuan'];
+      const tabs = ['dashboard', 'proker', 'tugas', 'temuan', 'aduan'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         const nav = document.getElementById(`nav-${t}`);
@@ -652,6 +739,9 @@
       } else if (tabName === 'temuan') {
         const res = await callAPI('getTemuanTL', { divisi: loggedUser.divisi });
         if(res.success) { appData.temuan = res.data.temuan; renderTemuan(); }
+      } else if (tabName === 'aduan') {
+        const res = await callAPI('getAduanMasuk', { divisi: loggedUser.divisi });
+        if(res.success) { appData.aduan = res.data; renderAduan(); }
       }
       toggleLoading(false);
     }
@@ -709,6 +799,35 @@
       
       const b = document.getElementById('badge-temuan');
       if(appData.temuan.length > 0) { b.classList.remove('hidden'); b.innerText = appData.temuan.length; } else { b.classList.add('hidden'); }
+    }
+
+    function renderAduan() {
+      const tbody = document.getElementById('tbl-aduan');
+      if(!appData.aduan || appData.aduan.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-slate-400">Belum ada aduan masuk.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = appData.aduan.map(a => {
+        const lampiran = (a.bukti && a.bukti !== '-') ? `<a href="${a.bukti}" target="_blank" class="text-indigo-600 font-bold mt-2 inline-block hover:underline"><i class="fa-solid fa-paperclip"></i> Lihat Bukti</a>` : '';
+        const statusClass = a.status.toLowerCase().includes('selesai') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+        return `<tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-3"><b>${a.pelapor}</b><br><span class="text-[10px] text-slate-500">${a.kelas}</span><br><span class="text-[9px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded mt-1 inline-block">${a.kategori}</span></td>
+          <td class="p-3 text-xs"><div class="max-w-md">${a.kronologi}</div>${lampiran}</td>
+          <td class="p-3"><span class="px-2 py-1 ${statusClass} text-[10px] rounded font-bold">${a.status}</span></td>
+          <td class="p-3 text-right"><button onclick="promptUpdateAduan('${a.id}')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold shadow-sm transition">Tindaklanjuti</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function promptUpdateAduan(id) {
+      const newStatus = prompt('Update Status Kasus untuk ID [' + id + ']:\nContoh: Sedang Diproses / Dimediasi / Selesai');
+      if(newStatus && newStatus.trim() !== '') {
+        toggleLoading(true);
+        const res = await callAPI('updateStatusAduan', { id: id, status: newStatus.trim() });
+        toggleLoading(false);
+        if(res.success) { showToast(res.message); fetchAdminData('aduan'); }
+        else { showToast(res.message, 'error'); }
+      }
     }
 
     async function handleFormJurnal(e) {
