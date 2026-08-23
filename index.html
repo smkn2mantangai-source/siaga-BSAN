@@ -539,7 +539,13 @@
                <select id="filter-porto-divisi" onchange="renderPortofolio()" class="text-xs p-2 border rounded-lg bg-white outline-none focus:border-indigo-500 w-full sm:w-auto">
                    <option value="All">Semua Divisi</option>
                    <option value="Keamanan">Keamanan</option>
+                   <option value="Kesehatan">Kesehatan</option>
+                   <option value="Pembelajaran">Pembelajaran</option>
+                   <option value="Perlindungan">Perlindungan</option>
+                   <option value="Partisipasi">Partisipasi</option>
                    <option value="Sarpras">Sarpras</option>
+                   <option value="Kenyamanan">Kenyamanan</option>
+                   <option value="Monev">Monev</option>
                    <option value="Umum">Umum/Lainnya</option>
                </select>
             </div>
@@ -631,11 +637,14 @@
       <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
           <h3 class="font-bold text-slate-800 text-base mb-4">Buat Program Kerja</h3>
           <form onsubmit="handleFormProker(event)" class="space-y-4">
-              <input type="text" id="add-proker-nama" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Nama Program">
-              <input type="text" id="add-proker-indikator" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Indikator Keberhasilan">
+              <!-- Atribut list & datalist untuk Auto-Saran -->
+              <input type="text" id="add-proker-nama" list="saran-proker" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Ketik atau pilih nama program...">
+              <datalist id="saran-proker"></datalist>
+              
+              <input type="text" id="add-proker-indikator" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Indikator Keberhasilan (Misal: 100% Tercapai)">
               <div class="grid grid-cols-2 gap-2">
                   <input type="text" id="add-proker-periode" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Periode">
-                  <input type="text" id="add-proker-target" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Target">
+                  <input type="text" id="add-proker-target" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Target Kuantitas">
               </div>
               <div class="flex gap-2 mt-4">
                   <button type="button" onclick="closeModal('modal-add-proker')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition">Batal</button>
@@ -654,7 +663,11 @@
                   <label class="block text-[10px] font-bold text-slate-500 mb-1">Pilih Program Terkait:</label>
                   <select id="add-tugas-program" class="w-full text-sm p-3 border rounded-xl bg-white outline-none focus:border-indigo-500"></select>
               </div>
-              <input type="text" id="add-tugas-nama" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Deskripsi Tugas">
+              
+              <!-- Atribut list & datalist untuk Auto-Saran Tugas -->
+              <input type="text" id="add-tugas-nama" list="saran-tugas" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Ketik atau pilih deskripsi tugas...">
+              <datalist id="saran-tugas"></datalist>
+              
               <input type="text" id="add-tugas-penerima" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500" placeholder="Penerima (Nama/Divisi)">
               <input type="date" id="add-tugas-deadline" required class="w-full text-sm p-3 border rounded-xl outline-none focus:border-indigo-500">
               <div class="flex gap-2 mt-4">
@@ -668,7 +681,7 @@
   <!-- Modal Catat Temuan Awal -->
   <div id="modal-add-temuan" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-      <h3 class="font-bold text-slate-800 text-base mb-4">Catat Temuan Awal</h3>
+      <h3 class="font-bold text-slate-800 text-base mb-4">Catat Temuan (Inspeksi Awal)</h3>
       <form onsubmit="handleFormTemuan(event)" class="space-y-3">
         <select id="add-temuan-kategori" required class="w-full text-sm p-3 border rounded-xl bg-white outline-none focus:border-rose-500">
             <option value="" disabled selected>Pilih Kategori...</option>
@@ -684,8 +697,12 @@
                 <option value="Tinggi">Prioritas Tinggi</option>
             </select>
             <select id="add-temuan-tldivisi" class="w-full text-sm p-3 border rounded-xl bg-white outline-none focus:border-rose-500">
-                <option value="Sarpras">Teruskan: Sarpras</option>
                 <option value="Keamanan">Teruskan: Keamanan</option>
+                <option value="Kesehatan">Teruskan: Kesehatan</option>
+                <option value="Pembelajaran">Teruskan: Pembelajaran</option>
+                <option value="Perlindungan">Teruskan: Perlindungan</option>
+                <option value="Partisipasi">Teruskan: Partisipasi</option>
+                <option value="Sarpras">Teruskan: Sarpras</option>
                 <option value="Kenyamanan">Teruskan: Kenyamanan</option>
             </select>
         </div>
@@ -1133,11 +1150,15 @@
         document.getElementById('admin-layout').classList.remove('hidden');
         
         document.getElementById('admin-user-name').innerText = `${loggedUser.nama}`; 
-        document.getElementById('admin-badge-divisi').innerText = `Divisi: ${loggedUser.divisi}`;
+        document.getElementById('admin-badge-divisi').innerText = `${loggedUser.role} / ${loggedUser.divisi}`;
+        
+        // Populate Datalist Saran (Otomatis isi sesuai tupoksi)
+        populateSaranInput(loggedUser.divisi);
         
         // RBAC Layanan Kasus
         const r = loggedUser.role.toLowerCase(); 
-        if(r.includes('kepala') || r.includes('perlindungan') || r.includes('bk') || r.includes('admin')) {
+        const d = loggedUser.divisi.toLowerCase();
+        if(r.includes('kepala') || r.includes('admin') || r.includes('pengawas') || d.includes('penanggung jawab') || d.includes('ketua') || d.includes('perlindungan') || d.includes('sekretaris') || r.includes('bk')) {
             document.getElementById('nav-group-layanan').classList.remove('hidden');
         } else {
             document.getElementById('nav-group-layanan').classList.add('hidden');
@@ -1192,6 +1213,52 @@
       }
       
       fetchAdminData(tabName);
+    }
+
+    // Fungsi Generate Saran (Datalist) berdasarkan Divisi SK
+    function populateSaranInput(divisi) {
+        const saranDb = {
+            'Keamanan': {
+                proker: ['Patroli Rutin Keamanan', 'Simulasi Bencana Kebakaran/Gempa', 'Penjagaan Gerbang Utama dan Area Rawan'],
+                tugas: ['Cek CCTV Area Parkir & Gerbang', 'Patroli Jam Istirahat di Area Rawan', 'Koordinasi dengan Guru Piket']
+            },
+            'Kesehatan': {
+                proker: ['Kampanye Perilaku Hidup Bersih & Sehat (PHBS)', 'Penyediaan P3K & Fasilitas UKS'],
+                tugas: ['Inspeksi Kebersihan Kantin', 'Penyediaan Sabun Cuci Tangan', 'Penanganan Siswa Sakit']
+            },
+            'Pembelajaran': {
+                proker: ['Audit Pembelajaran Tanpa Kekerasan', 'Klinik Belajar/Konsultasi Akademik'],
+                tugas: ['Supervisi Kelas', 'Penyediaan Materi Inklusif', 'Konsultasi Belajar Siswa']
+            },
+            'Perlindungan': {
+                proker: ['Kampanye Anti-Bullying (Roots)', 'Pengelolaan Kotak Curhat', 'Sosialisasi Tata Tertib Ramah Anak'],
+                tugas: ['Pengecekan Kotak Curhat', 'Mediasi Kasus Perundungan', 'Pembuatan Kesepakatan Kelas']
+            },
+            'Partisipasi': {
+                proker: ['Program Sekolah Mendengar (Suara Siswa)', 'Pelibatan Duta SRA / Agen Perubahan', 'Forum Orang Tua'],
+                tugas: ['Rapat Duta SRA', 'Kampanye BSAN via Mading', 'Fasilitasi Kotak Aspirasi']
+            },
+            'Sarpras': {
+                proker: ['Pemeliharaan Toilet Bersih & Aman', 'Pembuatan Rambu & Denah Evakuasi'],
+                tugas: ['Perbaikan Fasilitas Rusak', 'Inspeksi Titik Kumpul', 'Pemeliharaan Taman/Pojok Baca']
+            },
+            'Kenyamanan': {
+                proker: ['Gerakan Kelas Bersih', 'Pemantauan Sirkulasi Udara & Cahaya'],
+                tugas: ['Inspeksi Kebersihan Toilet', 'Pengecekan Ketersediaan Air', 'Kerja Bakti Rutin (Jumat Bersih)']
+            },
+            'Monev': {
+                proker: ['Survei Kepuasan Siswa (Iklim Sekolah)', 'Laporan Capaian Indikator BSAN'],
+                tugas: ['Mengumpulkan Data Kuesioner', 'Membuat Laporan Bulanan', 'Dokumentasi Portofolio']
+            }
+        };
+
+        const divKey = Object.keys(saranDb).find(k => divisi.includes(k)) || 'Default';
+        
+        let prokers = saranDb[divKey]?.proker || ['Program Rutin Divisi', 'Monitoring dan Evaluasi', 'Sosialisasi / Kampanye'];
+        let tugass = saranDb[divKey]?.tugas || ['Melaksanakan monitoring rutin', 'Mencatat temuan di lapangan', 'Melakukan perbaikan dan tindak lanjut'];
+
+        document.getElementById('saran-proker').innerHTML = prokers.map(p => `<option value="${p}">`).join('');
+        document.getElementById('saran-tugas').innerHTML = tugass.map(t => `<option value="${t}">`).join('');
     }
 
     async function fetchAdminData(tabName) {
